@@ -11,11 +11,11 @@ import { createBaseConfigFromStats } from '../utils/item-random.util';
 function getRarityLabel(rarity: ItemRarity): string {
   const labels: Record<ItemRarity, string> = {
     [ItemRarity.COMMON]: 'Thường',
-    [ItemRarity.UNCOMMON]: 'Lục',
-    [ItemRarity.RARE]: 'Lam',
-    [ItemRarity.EPIC]: 'Tím',
-    [ItemRarity.LEGENDARY]: 'Vàng',
-    [ItemRarity.MYTHIC]: 'Đỏ',
+    [ItemRarity.UNCOMMON]: 'Không thường',
+    [ItemRarity.RARE]: 'Hiếm',
+    [ItemRarity.EPIC]: 'Sử thi',
+    [ItemRarity.LEGENDARY]: 'Huyền thoại',
+    [ItemRarity.MYTHIC]: 'Thần thoại',
   };
   return labels[rarity];
 }
@@ -47,17 +47,17 @@ export async function seedEquipment(
         rarity: ItemRarity.UNCOMMON,
         grade: 2,
         multiplier: 1.5,
-        nameSuffix: ' [Lục]',
+        nameSuffix: '',
       },
-      { rarity: ItemRarity.RARE, grade: 3, multiplier: 2, nameSuffix: ' [Lam]' },
-      { rarity: ItemRarity.EPIC, grade: 4, multiplier: 3, nameSuffix: ' [Tím]' },
+      { rarity: ItemRarity.RARE, grade: 3, multiplier: 2, nameSuffix: '' },
+      { rarity: ItemRarity.EPIC, grade: 4, multiplier: 3, nameSuffix: '' },
       {
         rarity: ItemRarity.LEGENDARY,
         grade: 5,
         multiplier: 5,
-        nameSuffix: ' [Vàng]',
+        nameSuffix: '',
       },
-      { rarity: ItemRarity.MYTHIC, grade: 6, multiplier: 10, nameSuffix: ' [Đỏ]' },
+      { rarity: ItemRarity.MYTHIC, grade: 6, multiplier: 10, nameSuffix: '' },
     ];
 
     rarities.forEach(({ rarity, grade, multiplier, nameSuffix }) => {

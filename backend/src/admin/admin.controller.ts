@@ -273,5 +273,11 @@ export class AdminController {
     await this.adminService.deleteSystemConfig(key);
     return { success: true };
   }
+
+  // ========== UTILITY ENDPOINTS ==========
+  @Post('items/remove-suffixes')
+  async removeItemSuffixes() {
+    return this.adminService.removeItemSuffixes();
+  }
 }
 

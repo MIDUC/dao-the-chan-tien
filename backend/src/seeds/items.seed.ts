@@ -6,12 +6,12 @@ import { createBaseConfigFromStats } from '../utils/item-random.util';
 /**
  * Generate items with all rarity levels for each base item
  * Rarity mapping:
- * - COMMON (trắng/xám)
- * - UNCOMMON (lục/xanh lá)
- * - RARE (lam/xanh dương)
- * - EPIC (tím)
- * - LEGENDARY (vàng)
- * - MYTHIC (đỏ)
+ * - COMMON (Thường)
+ * - UNCOMMON (Không thường)
+ * - RARE (Hiếm)
+ * - EPIC (Sử thi)
+ * - LEGENDARY (Huyền thoại)
+ * - MYTHIC (Thần thoại)
  */
 export async function seedItems(itemRepo: Repository<Item>): Promise<Item[]> {
   const items: Partial<Item>[] = [];
@@ -28,11 +28,36 @@ export async function seedItems(itemRepo: Repository<Item>): Promise<Item[]> {
   ) => {
     const rarities = [
       { rarity: ItemRarity.COMMON, grade: 1, multiplier: 1, nameSuffix: '' },
-      { rarity: ItemRarity.UNCOMMON, grade: 2, multiplier: 1.5, nameSuffix: ' [Lục]' },
-      { rarity: ItemRarity.RARE, grade: 3, multiplier: 2, nameSuffix: ' [Lam]' },
-      { rarity: ItemRarity.EPIC, grade: 4, multiplier: 3, nameSuffix: ' [Tím]' },
-      { rarity: ItemRarity.LEGENDARY, grade: 5, multiplier: 5, nameSuffix: ' [Vàng]' },
-      { rarity: ItemRarity.MYTHIC, grade: 6, multiplier: 10, nameSuffix: ' [Đỏ]' },
+      {
+        rarity: ItemRarity.UNCOMMON,
+        grade: 2,
+        multiplier: 1.5,
+        nameSuffix: '',
+      },
+      {
+        rarity: ItemRarity.RARE,
+        grade: 3,
+        multiplier: 2,
+        nameSuffix: '',
+      },
+      {
+        rarity: ItemRarity.EPIC,
+        grade: 4,
+        multiplier: 3,
+        nameSuffix: '',
+      },
+      {
+        rarity: ItemRarity.LEGENDARY,
+        grade: 5,
+        multiplier: 5,
+        nameSuffix: '',
+      },
+      {
+        rarity: ItemRarity.MYTHIC,
+        grade: 6,
+        multiplier: 10,
+        nameSuffix: '',
+      },
     ];
 
     rarities.forEach(({ rarity, grade, multiplier, nameSuffix }) => {
@@ -42,7 +67,7 @@ export async function seedItems(itemRepo: Repository<Item>): Promise<Item[]> {
       });
 
       const finalStats = itemType === ItemType.EQUIPMENT ? stats : null;
-      
+
       items.push({
         name: `${baseName}${nameSuffix}`,
         description: `${baseDescription} (Phẩm cấp: ${getRarityLabel(rarity)})`,
@@ -55,14 +80,18 @@ export async function seedItems(itemRepo: Repository<Item>): Promise<Item[]> {
         sellable: true,
         sell_price: Math.floor(basePrice * multiplier),
         usable: itemType === ItemType.CONSUMABLE,
-        equipment_slot: itemType === ItemType.EQUIPMENT 
-          ? (category.startsWith('weapon') ? EquipmentSlot.WEAPON : EquipmentSlot.ARMOR)
-          : undefined,
+        equipment_slot:
+          itemType === ItemType.EQUIPMENT
+            ? category.startsWith('weapon')
+              ? EquipmentSlot.WEAPON
+              : EquipmentSlot.ARMOR
+            : undefined,
         equipment_stats: finalStats, // Base stats (for display/reference)
         // Create base_config for random stats (10% variance)
-        base_config: itemType === ItemType.EQUIPMENT && finalStats
-          ? createBaseConfigFromStats(finalStats, 10)
-          : undefined,
+        base_config:
+          itemType === ItemType.EQUIPMENT && finalStats
+            ? createBaseConfigFromStats(finalStats, 10)
+            : undefined,
         required_level: Math.floor(grade * 2),
         required_realm_level: Math.max(1, Math.floor(grade / 2)),
         is_active: true,
@@ -169,6 +198,105 @@ export async function seedItems(itemRepo: Repository<Item>): Promise<Item[]> {
     300,
   );
 
+  // Linh Thảo Cơ Bản (Material - Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Cơ Bản',
+    'Linh thảo thường gặp, có linh khí yếu, dùng để luyện đan cơ bản',
+    ItemType.MATERIAL,
+    'material_herb_basic',
+    'linh_thao_co_ban.png',
+    {},
+    15,
+  );
+
+  // Linh Thảo Ngàn Năm (Material - Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Ngàn Năm',
+    'Linh thảo đã sống ngàn năm, linh khí dồi dào, nguyên liệu quý cho luyện đan',
+    ItemType.MATERIAL,
+    'material_herb_thousand',
+    'linh_thao_ngan_nam.png',
+    {},
+    50,
+  );
+
+  // Linh Thảo Vạn Năm (Material - Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Vạn Năm',
+    'Linh thảo cổ xưa vạn năm tuổi, linh khí cực mạnh, hiếm có khó tìm',
+    ItemType.MATERIAL,
+    'material_herb_ten_thousand',
+    'linh_thao_van_nam.png',
+    {},
+    150,
+  );
+
+  // Linh Thảo Thần Thảo (Material - Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Thần Thảo',
+    'Thần thảo thiên địa, linh khí tinh thuần, chỉ có ở nơi linh khí cực thịnh',
+    ItemType.MATERIAL,
+    'material_herb_divine',
+    'linh_thao_than_thao.png',
+    {},
+    500,
+  );
+
+  // Linh Thảo Hỏa Diễm (Material - Fire Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Hỏa Diễm',
+    'Linh thảo mang thuộc tính hỏa, toả ra hơi nóng, dùng luyện đan hỏa tính',
+    ItemType.MATERIAL,
+    'material_herb_fire',
+    'linh_thao_hoa_diem.png',
+    {},
+    30,
+  );
+
+  // Linh Thảo Băng Tuyết (Material - Ice Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Băng Tuyết',
+    'Linh thảo mang thuộc tính băng, lạnh như băng tuyết, dùng luyện đan băng tính',
+    ItemType.MATERIAL,
+    'material_herb_ice',
+    'linh_thao_bang_tuyet.png',
+    {},
+    30,
+  );
+
+  // Linh Thảo Lôi Điện (Material - Lightning Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Lôi Điện',
+    'Linh thảo mang thuộc tính lôi, có tia điện lóe sáng, dùng luyện đan lôi tính',
+    ItemType.MATERIAL,
+    'material_herb_lightning',
+    'linh_thao_loi_dien.png',
+    {},
+    30,
+  );
+
+  // Linh Thảo Sinh Mệnh (Material - Life Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Sinh Mệnh',
+    'Linh thảo chứa sức sống dồi dào, có thể hồi phục sinh mệnh, cực kỳ quý hiếm',
+    ItemType.MATERIAL,
+    'material_herb_life',
+    'linh_thao_sinh_menh.png',
+    {},
+    200,
+  );
+
+  // Linh Thảo Hồn Phách (Material - Soul Spirit Herb)
+  createItemVariants(
+    'Linh Thảo Hồn Phách',
+    'Linh thảo tăng cường hồn phách, giúp tu vi tăng nhanh, bảo vật tu tiên',
+    ItemType.MATERIAL,
+    'material_herb_soul',
+    'linh_thao_hon_phach.png',
+    {},
+    300,
+  );
+
   const savedItems = await itemRepo.save(items);
   console.log(`✅ Created ${savedItems.length} items with all rarity levels`);
   return savedItems;
@@ -185,4 +313,3 @@ function getRarityLabel(rarity: ItemRarity): string {
   };
   return labelMap[rarity] || rarity;
 }
-

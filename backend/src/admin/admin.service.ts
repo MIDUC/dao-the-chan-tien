@@ -320,4 +320,29 @@ export class AdminService {
   async deleteSystemConfig(key: string): Promise<void> {
     await this.systemConfigRepository.delete({ key });
   }
+
+  // ========== UTILITY METHODS ==========
+  async removeItemSuffixes(): Promise<{ updated: number; items: Array<{ old: string; new: string }> }> {
+    const items = await this.itemRepository.find();
+    const updatedItems: Array<{ old: string; new: string }> = [];
+    let updatedCount = 0;
+
+    for (const item of items) {
+      const originalName = item.name;
+      // Remove patterns like [Lục], [Vàng], [Tím], [Lam], [Đỏ], [Trắng], [Xám]
+      const newName = originalName.replace(
+        /\s*\[(Lục|Vàng|Tím|Lam|Đỏ|Trắng|Xám)\]\s*$/i,
+        '',
+      ).trim();
+
+      if (originalName !== newName) {
+        item.name = newName;
+        await this.itemRepository.save(item);
+        updatedCount++;
+        updatedItems.push({ old: originalName, new: newName });
+      }
+    }
+
+    return { updated: updatedCount, items: updatedItems };
+  }
 }

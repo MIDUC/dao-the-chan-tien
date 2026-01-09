@@ -88,23 +88,28 @@ async function seed() {
 
     // Create Users
     // Hash passwords for real authentication
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const adminPasswordHash = await bcrypt.hash('admin123', 10);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const userPasswordHash = await bcrypt.hash('user123', 10);
 
     const users = [
       {
         username: 'admin',
         email: 'admin@example.com',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         password_hash: adminPasswordHash,
       },
       {
         username: 'dao_hieu_1',
         email: 'daohieu1@example.com',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         password_hash: userPasswordHash,
       },
       {
         username: 'tien_nhan_2',
         email: 'tiennhan2@example.com',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         password_hash: userPasswordHash,
       },
     ];
@@ -940,4 +945,4 @@ async function seed() {
   }
 }
 
-seed();
+void seed();
