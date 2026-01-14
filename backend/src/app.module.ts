@@ -35,7 +35,7 @@ import { FitnessModule } from './fitness/fitness.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Make ConfigModule available globally
-      envFilePath: '.env', // Path to .env file
+      envFilePath: process.env.NODE_ENV === 'production' ? undefined : '.env', // Don't use .env file in production (use Render env vars)
     }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(databaseConfig()),
