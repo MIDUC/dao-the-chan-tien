@@ -30,15 +30,6 @@ const { character, loading, fetchCharacter, realmDisplay } = useCharacter();
 const currentView = ref<string>("character");
 const authMode = ref<"login" | "register">("login");
 const currencies = ref<any[]>([]);
-  { id: "character", label: "Nhân Vật", icon: "🧘" },
-  { id: "achievements", label: "Thành Tựu", icon: "🏆" },
-  { id: "shop", label: "Cửa Hàng", icon: "🛒" },
-  { id: "skills", label: "Kỹ Năng", icon: "⚔️" },
-  { id: "leaderboard", label: "Xếp Hạng", icon: "📊" },
-  { id: "friends", label: "Bạn Bè", icon: "👥" },
-  { id: "notifications", label: "Thông Báo", icon: "🔔" },
-  ...(isAdmin.value ? [{ id: "admin", label: "Admin", icon: "⚙️" }] : []),
-]);
 
 const characterId = computed(
   () => character.value?.id || authState.value.character?.id || 0
