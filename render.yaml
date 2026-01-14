@@ -41,8 +41,10 @@ services:
 
   - type: static
     name: dao-the-chan-tien-frontend
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
     envVars:
       - key: VITE_API_URL
         sync: false
