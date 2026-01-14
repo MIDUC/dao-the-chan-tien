@@ -352,7 +352,6 @@ import { ref, watch, computed } from "vue";
 import { api } from "../../composables/useApi";
 import { formatRealm } from "../../utils/realm";
 import characterImageSrc from "../../assets/nhanvatngoithien1-removebg-preview.png";
-import closeButtonImage from "../../assets/Gemini_Generated_Image_xcq5h0xcq5h0xcq5-removebg-preview.png";
 
 const characterImage = characterImageSrc;
 

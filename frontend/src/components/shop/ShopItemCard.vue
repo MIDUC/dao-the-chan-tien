@@ -222,9 +222,9 @@ const getDisplayName = (name: string | undefined): string => {
   return name.replace(/\s*\[(Đỏ|Vàng|Tím|Lam|Lục|Trắng|Xám)\]\s*$/i, "").trim();
 };
 
-const getItemImageUrl = (item: Item | undefined): string | null => {
+const getItemImageUrl = (item: Item | undefined): string | undefined => {
   if (!item?.icon_url) {
-    return null;
+    return undefined;
   }
 
   // If it's already a full URL, return it

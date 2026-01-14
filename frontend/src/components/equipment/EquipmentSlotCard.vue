@@ -32,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 
 interface Equipment {
   id: number;
@@ -57,33 +56,6 @@ const emit = defineEmits<{
   equip: [inventoryId: number, slot: string];
   unequip: [slot: string];
 }>();
-
-const icon = computed(() => {
-  const slotIcons: Record<string, string> = {
-    weapon_1: '⚔️',
-    weapon_2: '⚔️',
-    armor: '🛡️',
-    helmet: '👑',
-    boots: '👢',
-    bracelet_1: '💍',
-    bracelet_2: '💍',
-    ring_1: '💎',
-    ring_2: '💎',
-    ring_3: '💎',
-    ring_4: '💎',
-    artifact_1: '✨',
-    artifact_2: '✨',
-    artifact_3: '✨',
-    artifact_4: '✨',
-    artifact_5: '✨',
-    artifact_6: '✨',
-    artifact_7: '✨',
-    artifact_8: '✨',
-    artifact_9: '✨',
-    artifact_10: '✨',
-  };
-  return slotIcons[props.slot] || '📦';
-});
 
 const handleClick = () => {
   // TODO: Open inventory modal to select item

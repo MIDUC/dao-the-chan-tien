@@ -107,7 +107,7 @@
                 <input
                   v-else
                   :value="editingConfig.value"
-                  @input="$emit('update-editing-value', $event.target.value)"
+                  @input="$emit('update-editing-value', ($event.target as HTMLInputElement).value)"
                   type="text"
                   class="w-full bg-gray-700/80 text-white px-4 py-2.5 rounded-lg text-sm font-mono font-semibold border-2 border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-400 shadow-lg shadow-yellow-500/20 transition-all duration-200"
                   @keyup.enter="$emit('save-config')"
@@ -129,7 +129,7 @@
                 <textarea
                   v-else
                   :value="editingConfig.description"
-                  @input="$emit('update-editing-description', $event.target.value)"
+                  @input="$emit('update-editing-description', ($event.target as HTMLTextAreaElement).value)"
                   class="w-full bg-gray-700/80 text-white px-4 py-2.5 rounded-lg text-xs border-2 border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-400 shadow-lg shadow-yellow-500/20 transition-all duration-200 resize-none"
                   rows="2"
                 ></textarea>
@@ -162,7 +162,7 @@
                 >
                   <input
                     :checked="editingConfig.is_active"
-                    @change="$emit('update-editing-active', $event.target.checked)"
+                    @change="$emit('update-editing-active', ($event.target as HTMLInputElement).checked)"
                     type="checkbox"
                     class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-yellow-500 focus:ring-2 focus:ring-yellow-500/50 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer transition-all"
                   />

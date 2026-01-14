@@ -2,7 +2,6 @@
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { useCharacter } from "../composables/useCharacter";
 import { useAuth } from "../composables/useAuth";
-import { formatNumber } from "../utils/formatNumber";
 import { api } from "../composables/useApi";
 import ExpBar from "../components/ExpBar.vue";
 import CharacterView from "../components/CharacterView.vue";
@@ -24,9 +23,6 @@ const {
   authState,
   isAuthenticated,
   isAdmin,
-  login,
-  register,
-  logout,
   checkAuth,
 } = useAuth();
 const { character, loading, fetchCharacter, realmDisplay } = useCharacter();
@@ -34,8 +30,6 @@ const { character, loading, fetchCharacter, realmDisplay } = useCharacter();
 const currentView = ref<string>("character");
 const authMode = ref<"login" | "register">("login");
 const currencies = ref<any[]>([]);
-
-const views = computed(() => [
   { id: "character", label: "Nhân Vật", icon: "🧘" },
   { id: "achievements", label: "Thành Tựu", icon: "🏆" },
   { id: "shop", label: "Cửa Hàng", icon: "🛒" },

@@ -174,7 +174,7 @@ const fetchShops = async () => {
   try {
     const response = await api.get('/shops');
     shops.value = response.data;
-    if (shops.value.length > 0) {
+    if (shops.value.length > 0 && shops.value[0]) {
       selectedShopId.value = shops.value[0].id;
       await fetchShopItems();
     }
@@ -234,9 +234,9 @@ onMounted(() => {
 });
 
 // Helper functions for modal
-const getItemImageUrl = (item: Item | undefined): string | null => {
+const getItemImageUrl = (item: Item | undefined): string | undefined => {
   if (!item?.icon_url) {
-    return null;
+    return undefined;
   }
 
   // If it's already a full URL, return it

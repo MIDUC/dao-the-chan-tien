@@ -274,6 +274,7 @@ interface Item {
   rarity: string;
   icon_url: string | null;
   quantity?: number;
+  usable?: boolean;
   equipment_stats?: {
     strength?: number;
     agility?: number;
@@ -418,9 +419,9 @@ const selectSlot = (slot: InventorySlot) => {
   selectedSlot.value = slot;
 };
 
-const getItemImageUrl = (item: Item): string | null => {
+const getItemImageUrl = (item: Item): string | undefined => {
   if (!item.icon_url) {
-    return null;
+    return undefined;
   }
 
   // If it's already a full URL, return it
@@ -514,7 +515,7 @@ const getRarityGlowStyle = (rarity: string, isSelected: boolean = false): string
     legendary: `box-shadow: 0 0 ${25 * intensity}px rgba(234, 179, 8, ${0.7 * intensity}), inset 0 0 ${12 * intensity}px rgba(234, 179, 8, 0.5);`,
     mythic: `box-shadow: 0 0 ${30 * intensity}px rgba(239, 68, 68, ${0.8 * intensity}), inset 0 0 ${15 * intensity}px rgba(239, 68, 68, 0.6);`,
   };
-  return glowMap[rarity] || glowMap.common;
+  return glowMap[rarity as keyof typeof glowMap] || glowMap.common;
 };
 
 const getRarityLabel = (rarity: string): string => {

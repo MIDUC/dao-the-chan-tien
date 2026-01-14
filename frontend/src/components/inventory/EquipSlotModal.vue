@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { api } from '../../composables/useApi';
 
 interface Item {
@@ -156,61 +156,6 @@ const getSlotLabel = (slot: string): string => {
   };
   return labels[slot] || slot;
 };
-
-// Calculate available slots based on item's equipment_slot
-const availableSlots = computed(() => {
-  const slots: string[] = [];
-  
-  if (!props.item.equipment_slot) {
-    // If no equipment_slot specified, show all slots
-    slots.push('weapon_1', 'weapon_2', 'armor', 'helmet', 'boots', 'bracelet_1', 'bracelet_2', 'ring_1', 'ring_2', 'ring_3', 'ring_4');
-    // Add artifact slots if available
-    for (let i = 1; i <= availableArtifactSlots.value; i++) {
-      slots.push(`artifact_${i}`);
-    }
-    return slots;
-  }
-  
-  const itemSlot = props.item.equipment_slot;
-  const itemSlotParts = itemSlot.split('_');
-  
-  // If item has specific slot (e.g., 'weapon_1'), only show that slot
-  if (itemSlotParts.length > 1) {
-    slots.push(itemSlot);
-    return slots;
-  }
-  
-  // If item has generic slot (e.g., 'weapon'), show all slots of that type
-  const slotType = itemSlotParts[0];
-  
-  switch (slotType) {
-    case 'weapon':
-      slots.push('weapon_1', 'weapon_2');
-      break;
-    case 'armor':
-      slots.push('armor');
-      break;
-    case 'helmet':
-      slots.push('helmet');
-      break;
-    case 'boots':
-      slots.push('boots');
-      break;
-    case 'bracelet':
-      slots.push('bracelet_1', 'bracelet_2');
-      break;
-    case 'ring':
-      slots.push('ring_1', 'ring_2', 'ring_3', 'ring_4');
-      break;
-    case 'artifact':
-      for (let i = 1; i <= availableArtifactSlots.value; i++) {
-        slots.push(`artifact_${i}`);
-      }
-      break;
-  }
-  
-  return slots;
-});
 
 const handleEquip = async (slot: string) => {
   try {

@@ -54,8 +54,8 @@ const router = createRouter({
 });
 
 // Navigation guard
-router.beforeEach(async (to, from, next) => {
-  const { isAuthenticated, isAdmin, checkAuth } = useAuth();
+router.beforeEach(async (to, _from, next) => {
+  const { isAdmin, checkAuth } = useAuth();
 
   // Check authentication
   if (to.meta.requiresAuth) {

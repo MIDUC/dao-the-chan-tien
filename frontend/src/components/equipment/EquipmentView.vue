@@ -176,7 +176,7 @@
 
       <!-- Modal để chọn cổ bảo từ inventory -->
       <ArtifactEquipModal
-        v-if="showArtifactEquipModal"
+        :show="showArtifactEquipModal"
         :character-id="characterId"
         @close="showArtifactEquipModal = false"
         @equipped="handleArtifactEquipped"
@@ -186,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { api } from '../../composables/useApi';
 import EquipmentSlot from './EquipmentSlot.vue';
 import EquipmentPaperDoll from './EquipmentPaperDoll.vue';

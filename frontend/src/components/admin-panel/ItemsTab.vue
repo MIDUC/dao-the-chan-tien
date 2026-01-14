@@ -76,7 +76,7 @@
             <span v-if="item.element && (Array.isArray(item.element) ? item.element.length > 0 : item.element !== 'none')" class="text-gray-500">
               Ngũ hành: 
               <span class="text-purple-400">
-                {{ Array.isArray(item.element) ? item.element.map(e => getElementName(e)).join(', ') : getElementName(item.element) }}
+                {{ Array.isArray(item.element) ? item.element.map((e: string) => getElementName(e)).join(', ') : getElementName(item.element) }}
               </span>
             </span>
             <span
@@ -150,9 +150,9 @@ const handleSubmit = (data: any) => {
   handleCloseModal();
 };
 
-const getItemImageUrl = (item: any): string | null => {
+const getItemImageUrl = (item: any): string | undefined => {
   if (!item?.icon_url) {
-    return null;
+    return undefined;
   }
 
   // If it's already a full URL, return it

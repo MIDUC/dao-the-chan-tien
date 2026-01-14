@@ -40,6 +40,14 @@ export function getRealmInfo(realmLevel: number): RealmInfo {
 
   // Fallback: if level exceeds all realms, return the last realm
   const lastRealm = REALM_CONFIG[REALM_CONFIG.length - 1];
+  if (!lastRealm) {
+    // Should never happen, but TypeScript requires this check
+    return {
+      name: 'Unknown',
+      tier: 1,
+      level: realmLevel,
+    };
+  }
   const tier = realmLevel - lastRealm.startLevel + 1;
   return {
     name: lastRealm.name,

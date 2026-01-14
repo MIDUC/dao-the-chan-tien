@@ -71,7 +71,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { useApi } from "../composables/useApi";
-import { formatNumber } from "../utils/formatNumber";
 import AdminTabs from "./admin-panel/AdminTabs.vue";
 import UsersTab from "./admin-panel/UsersTab.vue";
 import ItemsTab from "./admin-panel/ItemsTab.vue";

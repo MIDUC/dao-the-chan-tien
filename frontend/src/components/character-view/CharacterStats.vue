@@ -64,9 +64,4 @@ const expPercentage = computed(() => {
   const percentage = (props.exp / props.expRequired) * 100;
   return Math.min(100, Math.max(0, Math.round(percentage * 100) / 100));
 });
-
-const canBreakthrough = computed(() => {
-  if (!props.exp || !props.expRequired) return false;
-  return props.exp >= props.expRequired;
-});
 </script>
