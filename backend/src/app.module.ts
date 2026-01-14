@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
@@ -32,6 +33,10 @@ import { FitnessModule } from './fitness/fitness.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Make ConfigModule available globally
+      envFilePath: '.env', // Path to .env file
+    }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(databaseConfig()),
     CloudinaryModule,

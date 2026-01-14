@@ -10,7 +10,7 @@
       <div class="p-6">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-gray-300">
-            {{ editingItem ? 'Sửa Vật Phẩm' : 'Tạo Vật Phẩm Mới' }}
+            {{ editingItem ? "Sửa Vật Phẩm" : "Tạo Vật Phẩm Mới" }}
           </h2>
           <button
             @click="$emit('close')"
@@ -118,63 +118,87 @@
 
           <!-- Nguyên tố section riêng -->
           <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                Nguyên tố (có thể chọn nhiều)
-              </label>
-              <div class="bg-gray-800/50 rounded-lg p-4 space-y-4">
-                <!-- Ngũ Hành -->
-                <div>
-                  <span class="text-xs font-semibold text-gray-400 mb-3 block uppercase tracking-wide">Ngũ Hành</span>
-                  <div class="grid grid-cols-5 gap-2">
-                    <label
-                      v-for="elem in ['kim', 'moc', 'thuy', 'hoa', 'tho']"
-                      :key="elem"
-                      class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded border border-gray-700 hover:border-gray-500 hover:bg-gray-500/10 transition-all"
-                      :class="{ 'border-gray-500 bg-gray-500/20': formData.element.includes(elem) }"
-                    >
-                      <input
-                        type="checkbox"
-                        :value="elem"
-                        v-model="formData.element"
-                        class="w-4 h-4 text-gray-600 bg-gray-800 border-gray-700 rounded focus:ring-gray-500"
-                      />
-                      <span class="text-sm text-gray-300 font-medium">
-                        {{ getElementName(elem) }}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-                <!-- Dị Nguyên Tố -->
-                <div>
-                  <span class="text-xs font-semibold text-blue-400 mb-3 block uppercase tracking-wide">Dị Nguyên Tố</span>
-                  <div class="grid grid-cols-4 gap-2">
-                    <label
-                      v-for="elem in ['loi', 'bang', 'quang', 'am', 'phong', 'doc', 'thien', 'dia']"
-                      :key="elem"
-                      class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded border border-gray-700 hover:border-blue-500 hover:bg-blue-500/10 transition-all"
-                      :class="{ 'border-blue-500 bg-blue-500/20': formData.element.includes(elem) }"
-                    >
-                      <input
-                        type="checkbox"
-                        :value="elem"
-                        v-model="formData.element"
-                        class="w-4 h-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500"
-                      />
-                      <span class="text-sm text-gray-300 font-medium">
-                        {{ getElementName(elem) }}
-                      </span>
-                    </label>
-                  </div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Nguyên tố (có thể chọn nhiều)
+            </label>
+            <div class="bg-gray-800/50 rounded-lg p-4 space-y-4">
+              <!-- Ngũ Hành -->
+              <div>
+                <span
+                  class="text-xs font-semibold text-gray-400 mb-3 block uppercase tracking-wide"
+                  >Ngũ Hành</span
+                >
+                <div class="grid grid-cols-5 gap-2">
+                  <label
+                    v-for="elem in ['kim', 'moc', 'thuy', 'hoa', 'tho']"
+                    :key="elem"
+                    class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded border border-gray-700 hover:border-gray-500 hover:bg-gray-500/10 transition-all"
+                    :class="{
+                      'border-gray-500 bg-gray-500/20':
+                        formData.element.includes(elem),
+                    }"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="elem"
+                      v-model="formData.element"
+                      class="w-4 h-4 text-gray-600 bg-gray-800 border-gray-700 rounded focus:ring-gray-500"
+                    />
+                    <span class="text-sm text-gray-300 font-medium">
+                      {{ getElementName(elem) }}
+                    </span>
+                  </label>
                 </div>
               </div>
+              <!-- Dị Nguyên Tố -->
+              <div>
+                <span
+                  class="text-xs font-semibold text-blue-400 mb-3 block uppercase tracking-wide"
+                  >Dị Nguyên Tố</span
+                >
+                <div class="grid grid-cols-4 gap-2">
+                  <label
+                    v-for="elem in [
+                      'loi',
+                      'bang',
+                      'quang',
+                      'am',
+                      'phong',
+                      'doc',
+                      'thien',
+                      'dia',
+                    ]"
+                    :key="elem"
+                    class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded border border-gray-700 hover:border-blue-500 hover:bg-blue-500/10 transition-all"
+                    :class="{
+                      'border-blue-500 bg-blue-500/20':
+                        formData.element.includes(elem),
+                    }"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="elem"
+                      v-model="formData.element"
+                      class="w-4 h-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500"
+                    />
+                    <span class="text-sm text-gray-300 font-medium">
+                      {{ getElementName(elem) }}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Equipment Specific -->
-          <div v-if="formData.item_type === 'equipment'" class="border-t border-gray-700 pt-4 space-y-4">
+          <div
+            v-if="formData.item_type === 'equipment'"
+            class="border-t border-gray-700 pt-4 space-y-4"
+          >
             <h3 class="text-lg font-semibold text-gray-300 mb-3">
               Thông tin Trang bị
             </h3>
-            
+
             <!-- Basic Equipment Info -->
             <div class="grid grid-cols-2 gap-4">
               <div>
@@ -217,7 +241,9 @@
               <h4 class="text-md font-semibold text-gray-300 mb-2">
                 Chỉ số cố định
               </h4>
-              <p class="text-xs text-gray-400 mb-3">Dùng cho trang bị có chỉ số cố định</p>
+              <p class="text-xs text-gray-400 mb-3">
+                Dùng cho trang bị có chỉ số cố định
+              </p>
               <div class="grid grid-cols-3 gap-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-300 mb-1">
@@ -282,7 +308,9 @@
               <h4 class="text-md font-semibold text-gray-300 mb-2">
                 Khoảng chỉ số ngẫu nhiên
               </h4>
-              <p class="text-xs text-gray-400 mb-3">Dùng cho trang bị có chỉ số ngẫu nhiên</p>
+              <p class="text-xs text-gray-400 mb-3">
+                Dùng cho trang bị có chỉ số ngẫu nhiên
+              </p>
               <div class="space-y-3">
                 <div class="grid grid-cols-4 gap-4">
                   <div>
@@ -439,7 +467,10 @@
                   + Thêm Qi Bonus
                 </button>
               </div>
-              <div v-if="formData.qi_bonus.length === 0" class="text-gray-400 text-sm mb-2">
+              <div
+                v-if="formData.qi_bonus.length === 0"
+                class="text-gray-400 text-sm mb-2"
+              >
                 Chưa có Qi bonus nào
               </div>
               <div
@@ -469,7 +500,9 @@
                       <option value="yin_qi">Âm Khí</option>
                       <option value="impure_qi">Trọc Khí</option>
                       <option value="prenatal_qi">Tiên Thiên Khí</option>
-                      <option value="grandmist_purple_qi">Hồng Mông Tử Khí</option>
+                      <option value="grandmist_purple_qi">
+                        Hồng Mông Tử Khí
+                      </option>
                       <option value="chaos_qi">Hỗn Độn Khí</option>
                       <option value="imperial_qi">Đế Khí</option>
                       <option value="aura_qi">Cương Khí</option>
@@ -558,14 +591,45 @@
           <!-- Icon URL -->
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">
-              Đường dẫn hình ảnh
+              Hình ảnh
             </label>
-            <input
-              v-model="formData.icon_url"
-              type="text"
-              placeholder="Tên file hoặc URL đầy đủ"
-              class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:border-gray-500"
-            />
+            <div class="space-y-2">
+              <!-- File Upload -->
+              <div>
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept="image/*"
+                  @change="handleFileSelect"
+                  class="hidden"
+                />
+                <button
+                  type="button"
+                  @click="() => (fileInput as HTMLInputElement)?.click()"
+                  class="w-full bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded px-3 py-2 text-white transition-colors"
+                >
+                  {{ uploading ? "Đang tải lên..." : "Chọn ảnh từ máy tính" }}
+                </button>
+              </div>
+              <!-- URL Input (fallback) -->
+              <div>
+                <input
+                  v-model="formData.icon_url"
+                  type="text"
+                  placeholder="Hoặc nhập URL Cloudinary (https://res.cloudinary.com/...)"
+                  class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:border-gray-500"
+                />
+              </div>
+              <!-- Preview -->
+              <div v-if="formData.icon_url" class="mt-2">
+                <img
+                  :src="formData.icon_url"
+                  alt="Preview"
+                  class="max-w-xs max-h-32 object-contain rounded border border-gray-700"
+                  @error="handleImageError"
+                />
+              </div>
+            </div>
           </div>
 
           <!-- Active Status -->
@@ -587,7 +651,7 @@
               type="submit"
               class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-colors"
             >
-              {{ editingItem ? 'Cập nhật' : 'Tạo mới' }}
+              {{ editingItem ? "Cập nhật" : "Tạo mới" }}
             </button>
             <button
               type="button"
@@ -604,7 +668,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
+import { api } from "../../composables/useApi";
 
 const props = defineProps<{
   show: boolean;
@@ -617,12 +682,12 @@ const emit = defineEmits<{
 }>();
 
 const formData = ref({
-  name: '',
-  description: '',
-  item_type: 'consumable',
-  category: '',
+  name: "",
+  description: "",
+  item_type: "consumable",
+  category: "",
   grade: 1,
-  rarity: 'common',
+  rarity: "common",
   max_stack: 1,
   sellable: true,
   sell_price: 0,
@@ -631,7 +696,7 @@ const formData = ref({
   required_level: 1,
   required_realm_level: 1,
   element: [] as string[],
-  icon_url: '',
+  icon_url: "",
   is_active: true,
   equipment_stats: {
     strength: null as number | null,
@@ -654,7 +719,11 @@ const formData = ref({
     can_refine: false,
     can_socket: false,
   },
-  qi_bonus: [] as Array<{ qi_type?: string; amount?: number; per_minute?: number }>,
+  qi_bonus: [] as Array<{
+    qi_type?: string;
+    amount?: number;
+    per_minute?: number;
+  }>,
 });
 
 watch(
@@ -662,12 +731,12 @@ watch(
   (item) => {
     if (item) {
       formData.value = {
-        name: item.name || '',
-        description: item.description || '',
-        item_type: item.item_type || 'consumable',
-        category: item.category || '',
+        name: item.name || "",
+        description: item.description || "",
+        item_type: item.item_type || "consumable",
+        category: item.category || "",
         grade: item.grade || 1,
-        rarity: item.rarity || 'common',
+        rarity: item.rarity || "common",
         max_stack: item.max_stack || 1,
         sellable: item.sellable !== undefined ? item.sellable : true,
         sell_price: item.sell_price || 0,
@@ -675,8 +744,12 @@ watch(
         equipment_slot: item.equipment_slot || null,
         required_level: item.required_level || 1,
         required_realm_level: item.required_realm_level || 1,
-        element: Array.isArray(item.element) ? item.element : (item.element ? [item.element] : []),
-        icon_url: item.icon_url || '',
+        element: Array.isArray(item.element)
+          ? item.element
+          : item.element
+          ? [item.element]
+          : [],
+        icon_url: item.icon_url || "",
         is_active: item.is_active !== undefined ? item.is_active : true,
         equipment_stats: item.equipment_stats || {
           strength: null,
@@ -704,12 +777,12 @@ watch(
     } else {
       // Reset form
       formData.value = {
-        name: '',
-        description: '',
-        item_type: 'consumable',
-        category: '',
+        name: "",
+        description: "",
+        item_type: "consumable",
+        category: "",
         grade: 1,
-        rarity: 'common',
+        rarity: "common",
         max_stack: 1,
         sellable: true,
         sell_price: 0,
@@ -718,7 +791,7 @@ watch(
         required_level: 1,
         required_realm_level: 1,
         element: [],
-        icon_url: '',
+        icon_url: "",
         is_active: true,
         equipment_stats: {
           strength: null,
@@ -750,9 +823,9 @@ watch(
 
 const addQiBonus = () => {
   formData.value.qi_bonus.push({
-    qi_type: '',
-    amount: null,
-    per_minute: null,
+    qi_type: "",
+    amount: undefined,
+    per_minute: undefined,
   });
 };
 
@@ -763,22 +836,90 @@ const removeQiBonus = (index: number) => {
 const getElementName = (elem: string): string => {
   const names: Record<string, string> = {
     // Ngũ Hành
-    kim: 'Kim',
-    moc: 'Mộc',
-    thuy: 'Thủy',
-    hoa: 'Hỏa',
-    tho: 'Thổ',
+    kim: "Kim",
+    moc: "Mộc",
+    thuy: "Thủy",
+    hoa: "Hỏa",
+    tho: "Thổ",
     // Dị Nguyên Tố
-    loi: 'Lôi',
-    bang: 'Băng',
-    quang: 'Quang',
-    am: 'Ám',
-    phong: 'Phong',
-    doc: 'Độc',
-    thien: 'Thiên',
-    dia: 'Địa',
+    loi: "Lôi",
+    bang: "Băng",
+    quang: "Quang",
+    am: "Ám",
+    phong: "Phong",
+    doc: "Độc",
+    thien: "Thiên",
+    dia: "Địa",
   };
   return names[elem] || elem;
+};
+
+const fileInput = ref<HTMLInputElement | null>(null);
+const uploading = ref(false);
+
+const handleFileSelect = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+
+  if (!file) {
+    return;
+  }
+
+  // Validate file type
+  if (!file.type.startsWith("image/")) {
+    alert("Vui lòng chọn file ảnh");
+    return;
+  }
+
+  // Validate file size (max 10MB - có thể config)
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  if (file.size > maxSize) {
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    alert(
+      `Kích thước file (${fileSizeMB}MB) vượt quá giới hạn 10MB. Vui lòng chọn file nhỏ hơn.`
+    );
+    return;
+  }
+
+  uploading.value = true;
+
+  try {
+    // Create FormData
+    const formDataToUpload = new FormData();
+    formDataToUpload.append("file", file);
+
+    // Upload to Cloudinary via backend
+    const response = await api.post("/upload/item", formDataToUpload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (response.data?.url) {
+      formData.value.icon_url = response.data.url;
+      alert("Tải ảnh lên thành công!");
+    } else {
+      throw new Error("Không nhận được URL từ server");
+    }
+  } catch (error: any) {
+    console.error("Error uploading image:", error);
+    alert(
+      error.response?.data?.message ||
+        error.message ||
+        "Có lỗi xảy ra khi tải ảnh lên"
+    );
+  } finally {
+    uploading.value = false;
+    // Reset file input
+    if (target) {
+      target.value = "";
+    }
+  }
+};
+
+const handleImageError = () => {
+  // Image failed to load, but don't clear the URL
+  // User might have entered a URL that's temporarily unavailable
 };
 
 const handleSubmit = () => {
@@ -793,7 +934,7 @@ const handleSubmit = () => {
   };
 
   // Clean equipment_stats - remove null values
-  if (formData.value.item_type === 'equipment') {
+  if (formData.value.item_type === "equipment") {
     cleanedData.equipment_stats = Object.fromEntries(
       Object.entries(formData.value.equipment_stats).filter(
         ([_, v]) => v !== null && v !== undefined
@@ -819,7 +960,8 @@ const handleSubmit = () => {
 
     // Clean qi_bonus - remove empty entries
     cleanedData.qi_bonus = formData.value.qi_bonus.filter(
-      (bonus) => bonus.qi_type && (bonus.amount !== null || bonus.per_minute !== null)
+      (bonus) =>
+        bonus.qi_type && (bonus.amount !== null || bonus.per_minute !== null)
     );
     if (cleanedData.qi_bonus.length === 0) {
       cleanedData.qi_bonus = undefined;
@@ -832,7 +974,6 @@ const handleSubmit = () => {
     cleanedData.equipment_slot = undefined;
   }
 
-  emit('submit', cleanedData);
+  emit("submit", cleanedData);
 };
 </script>
-
