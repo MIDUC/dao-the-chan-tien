@@ -515,7 +515,8 @@ const getRarityGlowStyle = (rarity: string, isSelected: boolean = false): string
     legendary: `box-shadow: 0 0 ${25 * intensity}px rgba(234, 179, 8, ${0.7 * intensity}), inset 0 0 ${12 * intensity}px rgba(234, 179, 8, 0.5);`,
     mythic: `box-shadow: 0 0 ${30 * intensity}px rgba(239, 68, 68, ${0.8 * intensity}), inset 0 0 ${15 * intensity}px rgba(239, 68, 68, 0.6);`,
   };
-  return glowMap[rarity as keyof typeof glowMap] || glowMap.common;
+  const result = glowMap[rarity as keyof typeof glowMap];
+  return result ?? glowMap.common;
 };
 
 const getRarityLabel = (rarity: string): string => {

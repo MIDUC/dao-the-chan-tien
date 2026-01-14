@@ -22,7 +22,6 @@ import RegisterForm from "../components/RegisterForm.vue";
 const {
   authState,
   isAuthenticated,
-  isAdmin,
   checkAuth,
 } = useAuth();
 const { character, loading, fetchCharacter, realmDisplay } = useCharacter();
