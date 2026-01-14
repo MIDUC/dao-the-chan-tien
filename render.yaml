@@ -3,7 +3,7 @@ services:
     name: dao-the-chan-tien-backend
     env: node
     plan: starter
-    buildCommand: cd backend && npm install && npm run build
+    buildCommand: cd backend && npm install --legacy-peer-deps && npm run build
     startCommand: cd backend && npm run start:prod
     envVars:
       - key: NODE_ENV
@@ -22,7 +22,7 @@ services:
       - key: DB_DATABASE
         sync: false
       - key: DB_SSL
-        value: 'true'
+        value: "true"
       # Cloudinary
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
@@ -38,4 +38,3 @@ services:
       # Frontend URL (for CORS)
       - key: FRONTEND_URL
         sync: false
-
