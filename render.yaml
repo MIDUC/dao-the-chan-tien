@@ -38,3 +38,12 @@ services:
       # Frontend URL (for CORS)
       - key: FRONTEND_URL
         sync: false
+
+  - type: web
+    name: dao-the-chan-tien-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
