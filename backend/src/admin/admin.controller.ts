@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -32,8 +33,13 @@ export class AdminController {
 
   // ========== USER MANAGEMENT ==========
   @Get('users')
-  async getAllUsers() {
-    return this.adminService.getAllUsers();
+  async getAllUsers(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const pageSizeNum = pageSize ? parseInt(pageSize, 10) : 20;
+    return this.adminService.getAllUsers(pageNum, pageSizeNum);
   }
 
   @Get('users/:id')
@@ -84,8 +90,22 @@ export class AdminController {
 
   // ========== ITEM MANAGEMENT ==========
   @Get('items')
-  async getAllItems() {
-    return this.adminService.getAllItems();
+  async getAllItems(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('search') search?: string,
+    @Query('itemType') itemType?: string,
+    @Query('rarity') rarity?: string,
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const pageSizeNum = pageSize ? parseInt(pageSize, 10) : 20;
+    return this.adminService.getAllItems(
+      pageNum,
+      pageSizeNum,
+      search,
+      itemType,
+      rarity,
+    );
   }
 
   @Get('items/:id')
@@ -110,8 +130,13 @@ export class AdminController {
 
   // ========== NPC MANAGEMENT ==========
   @Get('npcs')
-  async getAllNPCs() {
-    return this.adminService.getAllNPCs();
+  async getAllNPCs(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const pageSizeNum = pageSize ? parseInt(pageSize, 10) : 20;
+    return this.adminService.getAllNPCs(pageNum, pageSizeNum);
   }
 
   @Get('npcs/:id')
@@ -136,8 +161,13 @@ export class AdminController {
 
   // ========== QUEST MANAGEMENT ==========
   @Get('quests')
-  async getAllQuests() {
-    return this.adminService.getAllQuests();
+  async getAllQuests(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const pageSizeNum = pageSize ? parseInt(pageSize, 10) : 20;
+    return this.adminService.getAllQuests(pageNum, pageSizeNum);
   }
 
   @Get('quests/:id')

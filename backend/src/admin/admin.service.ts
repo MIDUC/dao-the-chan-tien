@@ -40,10 +40,28 @@ export class AdminService {
   ) {}
 
   // ========== USER MANAGEMENT ==========
-  async getAllUsers(): Promise<User[]> {
-    return this.userRepository.find({
+  async getAllUsers(page: number = 1, pageSize: number = 20): Promise<{
+    data: User[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
+    const skip = (page - 1) * pageSize;
+    const [data, total] = await this.userRepository.findAndCount({
       relations: ['characters', 'roles'],
+      skip,
+      take: pageSize,
+      order: { id: 'ASC' },
     });
+
+    return {
+      data,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   async getUserById(id: number): Promise<User | null> {
@@ -105,8 +123,142 @@ export class AdminService {
   }
 
   // ========== ITEM MANAGEMENT ==========
-  async getAllItems(): Promise<Item[]> {
-    return this.itemRepository.find();
+  async getAllItems(
+    page: number = 1,
+    pageSize: number = 20,
+    search?: string,
+    itemType?: string,
+    rarity?: string,
+  ): Promise<{
+    data: Item[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
+    // Đảm bảo page và pageSize hợp lệ
+    const validPage = Math.max(1, page);
+    const validPageSize = Math.max(1, Math.min(100, pageSize)); // Max 100 items per page
+    const skip = (validPage - 1) * validPageSize;
+
+    console.log('AdminService.getAllItems - Input:', {
+      page,
+      pageSize,
+      validPage,
+      validPageSize,
+      skip,
+      search,
+      itemType,
+      rarity,
+    });
+
+    // Build where conditions
+    const whereConditions: any = {};
+    
+    if (itemType && itemType.trim()) {
+      whereConditions.item_type = itemType.trim();
+    }
+
+    if (rarity && rarity.trim()) {
+      whereConditions.rarity = rarity.trim();
+    }
+
+    // Build query options - chỉ thêm where nếu có điều kiện
+    const findOptions: any = {
+      skip: skip,
+      take: validPageSize,
+      order: {
+        id: 'ASC',
+      },
+    };
+    
+    if (Object.keys(whereConditions).length > 0) {
+      findOptions.where = whereConditions;
+    }
+
+    // Nếu có search, phải dùng query builder vì cần LIKE
+    if (search && search.trim()) {
+      const queryBuilder = this.itemRepository.createQueryBuilder('item');
+      
+      // Apply where conditions
+      if (Object.keys(whereConditions).length > 0) {
+        Object.entries(whereConditions).forEach(([key, value]) => {
+          queryBuilder.andWhere(`item.${key} = :${key}`, { [key]: value });
+        });
+      }
+      
+      // Apply search
+      queryBuilder.andWhere(
+        '(item.name LIKE :search OR item.description LIKE :search)',
+        { search: `%${search.trim()}%` },
+      );
+      
+      // Count query (clone trước khi thêm skip/take)
+      const countQuery = queryBuilder.clone();
+      
+      // Data query với pagination - QUAN TRỌNG: skip và take phải được gọi trước getMany()
+      queryBuilder
+        .skip(skip)
+        .take(validPageSize)
+        .orderBy('item.id', 'ASC');
+      
+      const sql = queryBuilder.getSql();
+      const params = queryBuilder.getParameters();
+      console.log('QueryBuilder SQL:', sql);
+      console.log('QueryBuilder Params:', params);
+      
+      const [data, total] = await Promise.all([
+        queryBuilder.getMany(),
+        countQuery.getCount(),
+      ]);
+
+      const totalPages = total > 0 ? Math.ceil(total / validPageSize) : 0;
+
+      console.log('AdminService.getAllItems - Result (with search):', {
+        page: validPage,
+        pageSize: validPageSize,
+        skip,
+        total,
+        totalPages,
+        dataCount: data.length,
+        firstItemId: data.length > 0 ? data[0].id : null,
+        lastItemId: data.length > 0 ? data[data.length - 1].id : null,
+      });
+
+      return {
+        data,
+        total,
+        page: validPage,
+        pageSize: validPageSize,
+        totalPages,
+      };
+    }
+
+    // Không có search, dùng findAndCount giống getAllUsers
+    console.log('Using findAndCount without search. Options:', JSON.stringify(findOptions, null, 2));
+    
+    const [data, total] = await this.itemRepository.findAndCount(findOptions);
+
+    const totalPages = total > 0 ? Math.ceil(total / validPageSize) : 0;
+
+    console.log('AdminService.getAllItems - Result (without search):', {
+      page: validPage,
+      pageSize: validPageSize,
+      skip,
+      total,
+      totalPages,
+      dataCount: data.length,
+      firstItemId: data.length > 0 ? data[0].id : null,
+      lastItemId: data.length > 0 ? data[data.length - 1].id : null,
+    });
+
+    return {
+      data,
+      total,
+      page: validPage,
+      pageSize: validPageSize,
+      totalPages,
+    };
   }
 
   async getItemById(id: number): Promise<Item | null> {
@@ -132,8 +284,28 @@ export class AdminService {
   }
 
   // ========== NPC MANAGEMENT ==========
-  async getAllNPCs(): Promise<NPC[]> {
-    return this.npcRepository.find({ relations: ['quests'] });
+  async getAllNPCs(page: number = 1, pageSize: number = 20): Promise<{
+    data: NPC[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
+    const skip = (page - 1) * pageSize;
+    const [data, total] = await this.npcRepository.findAndCount({
+      relations: ['quests'],
+      skip,
+      take: pageSize,
+      order: { id: 'ASC' },
+    });
+
+    return {
+      data,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   async getNPCById(id: number): Promise<NPC | null> {
@@ -162,8 +334,28 @@ export class AdminService {
   }
 
   // ========== QUEST MANAGEMENT ==========
-  async getAllQuests(): Promise<Quest[]> {
-    return this.questRepository.find({ relations: ['npc'] });
+  async getAllQuests(page: number = 1, pageSize: number = 20): Promise<{
+    data: Quest[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
+    const skip = (page - 1) * pageSize;
+    const [data, total] = await this.questRepository.findAndCount({
+      relations: ['npc'],
+      skip,
+      take: pageSize,
+      order: { id: 'ASC' },
+    });
+
+    return {
+      data,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   async getQuestById(id: number): Promise<Quest | null> {

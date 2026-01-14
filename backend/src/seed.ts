@@ -21,7 +21,10 @@ import { formatRealm } from './utils/realm.util';
 import { seedItems } from './seeds/items.seed';
 import { seedEquipment } from './seeds/equipment.seed';
 import { seedShops } from './seeds/shops.seed';
+import { seedQiEffects } from './seeds/qi-effects.seed';
+import { seedAncientArtifacts } from './seeds/ancient-artifacts.seed';
 import { addItemToInventory } from './utils/inventory.util';
+import { QiEffect } from './entities/qi.entity';
 
 async function seed() {
   const dataSource = new DataSource(getDataSourceOptions());
@@ -46,6 +49,7 @@ async function seed() {
     const currencyRepo = dataSource.getRepository(Currency);
     const shopRepo = dataSource.getRepository(Shop);
     const shopItemRepo = dataSource.getRepository(ShopItem);
+    const qiEffectRepo = dataSource.getRepository(QiEffect);
 
     // Clear existing data
     // MySQL doesn't allow TRUNCATE with foreign keys, so we use DELETE
@@ -71,6 +75,8 @@ async function seed() {
     await dataSource.query('DELETE FROM achievements');
     await dataSource.query('DELETE FROM currency');
     await dataSource.query('DELETE FROM system_config');
+    await dataSource.query('DELETE FROM character_qi');
+    await qiEffectRepo.clear();
     await equipmentRepo.clear();
     await inventoryRepo.clear();
     await itemEffectRepo.clear();
@@ -174,6 +180,17 @@ async function seed() {
         realm_level: 99, // Độ Kiếp Tầng 9
         exp: 50,
         base_exp_per_interval: 100, // Base EXP mỗi lần cộng
+        // Primary Stats
+        luc_dao: 15,
+        can_cot: 12,
+        than_phap: 12,
+        ngo_tinh: 18,
+        dinh_luc: 10,
+        // Hidden Stats
+        linh_can: 'moc' as const, // Wood element
+        phuc_duyen: 50,
+        tam_canh: 50,
+        // Legacy stats
         strength: 15,
         agility: 12,
         wisdom: 18,
@@ -185,6 +202,17 @@ async function seed() {
         realm_level: 8, // Luyện Khí Tầng 8
         exp: 120,
         base_exp_per_interval: 12, // Base EXP mỗi lần cộng
+        // Primary Stats
+        luc_dao: 10,
+        can_cot: 14,
+        than_phap: 16,
+        ngo_tinh: 20,
+        dinh_luc: 12,
+        // Hidden Stats
+        linh_can: 'thuy' as const, // Water element
+        phuc_duyen: 55,
+        tam_canh: 60,
+        // Legacy stats
         strength: 10,
         agility: 16,
         wisdom: 20,
@@ -196,6 +224,17 @@ async function seed() {
         realm_level: 14, // Trúc Cơ Tầng 4
         exp: 350,
         base_exp_per_interval: 55, // Đã độ kiếp Trúc Cơ, được random thêm 40-60
+        // Primary Stats
+        luc_dao: 25,
+        can_cot: 22,
+        than_phap: 20,
+        ngo_tinh: 22,
+        dinh_luc: 18,
+        // Hidden Stats
+        linh_can: 'hoa' as const, // Fire element
+        phuc_duyen: 60,
+        tam_canh: 45,
+        // Legacy stats (for backward compatibility)
         strength: 25,
         agility: 20,
         wisdom: 22,
@@ -417,9 +456,11 @@ async function seed() {
         item.name.includes('Mộc Kiếm'),
       );
 
-      for (const item of mocKiemItems) {
-        await addItemToInventory(inventoryRepo, savedCharacters[0].id, item, 1);
-        inventoryCount++;
+      if (savedCharacters[0]?.id) {
+        for (const item of mocKiemItems) {
+          await addItemToInventory(inventoryRepo, savedCharacters[0].id, item, 1);
+          inventoryCount++;
+        }
       }
 
       // Add some materials (Đá Thuộc Tính) - these will stack
@@ -427,7 +468,7 @@ async function seed() {
         item.name.includes('Đá Thuộc Tính'),
       );
 
-      if (daThuocTinhItems.length > 0) {
+      if (daThuocTinhItems.length > 0 && savedCharacters[0]?.id) {
         // Add first material type with quantity 10
         await addItemToInventory(
           inventoryRepo,
@@ -919,6 +960,16 @@ async function seed() {
     const savedRealmLevels = await realmLevelRepo.save(realmLevels);
     console.log(`✅ Created ${savedRealmLevels.length} realm levels`);
 
+    // ========== QI EFFECTS ==========
+    console.log('\n⚡ Seeding Qi Effects...');
+    const savedQiEffects = await seedQiEffects(qiEffectRepo);
+    console.log(`✅ Created ${savedQiEffects.length} Qi effects`);
+
+    // ========== ANCIENT ARTIFACTS (Cổ Bảo) ==========
+    console.log('\n💎 Seeding Ancient Artifacts...');
+    await seedAncientArtifacts(dataSource);
+    console.log('✅ Ancient Artifacts seeded');
+
     console.log('\n🎉 Seed completed successfully!');
     console.log('\n📊 Summary:');
     console.log(`   - Users: ${savedUsers.length}`);
@@ -937,6 +988,7 @@ async function seed() {
     console.log(`   - System Configs: ${savedConfigs.length}`);
     console.log(`   - Status Logs: ${savedStatusLogs.length}`);
     console.log(`   - Realm Levels: ${savedRealmLevels.length}`);
+    console.log(`   - Qi Effects: ${savedQiEffects.length}`);
   } catch (error) {
     console.error('❌ Error seeding database:', error);
     throw error;

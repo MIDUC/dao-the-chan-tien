@@ -212,6 +212,27 @@
               {{ formatNumber(selectedSlot.inventoryItem.item.sell_price) }} Linh Thạch
             </div>
           </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-4 pt-4 border-t border-gray-700 space-y-2">
+            <!-- Equip Button for Equipment -->
+            <button
+              v-if="selectedSlot.inventoryItem.item.item_type === 'equipment'"
+              @click="showEquipModal = true"
+              class="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors font-semibold"
+            >
+              Trang Bị
+            </button>
+            
+            <!-- Use Button for Consumables -->
+            <button
+              v-else-if="selectedSlot.inventoryItem.item.item_type === 'consumable' && selectedSlot.inventoryItem.item.usable"
+              @click="useItem"
+              class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-semibold"
+            >
+              Sử Dụng
+            </button>
+          </div>
         </div>
       </div>
 
@@ -225,6 +246,17 @@
         </p>
       </div>
     </div>
+
+    <!-- Equip Modal -->
+    <EquipSlotModal
+      v-if="showEquipModal && selectedSlot?.inventoryItem"
+      :show="showEquipModal"
+      :item="selectedSlot.inventoryItem.item"
+      :inventory-id="selectedSlot.inventoryItem.id"
+      :character-id="characterId"
+      @close="showEquipModal = false"
+      @equipped="handleEquipped"
+    />
   </div>
 </template>
 
@@ -232,6 +264,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { api } from '../../composables/useApi';
 import { formatNumber } from '../../utils/formatNumber';
+import EquipSlotModal from './EquipSlotModal.vue';
 
 interface Item {
   id: number;
@@ -278,6 +311,7 @@ const inventoryItems = ref<InventoryItem[]>([]);
 const selectedSlot = ref<InventorySlot | null>(null);
 const maxSlots = ref(20); // Default, will be fetched from character
 const character = ref<any>(null);
+const showEquipModal = ref(false);
 
 // Calculate used slots
 const usedSlots = computed(() => {
@@ -325,6 +359,32 @@ const fetchInventory = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const useItem = async () => {
+  if (!selectedSlot.value?.inventoryItem) return;
+  
+  try {
+    const response = await api.post('/items/use', {
+      inventoryId: selectedSlot.value.inventoryItem.id,
+      quantity: 1,
+    });
+    
+    if (response.data.success) {
+      await fetchInventory();
+      selectedSlot.value = null;
+    }
+  } catch (error) {
+    console.error('Error using item:', error);
+  }
+};
+
+const handleEquipped = async () => {
+  // Refresh inventory to remove equipped item
+  await fetchInventory();
+  // Clear selection
+  selectedSlot.value = null;
+  showEquipModal.value = false;
 };
 
 const expandInventory = async () => {

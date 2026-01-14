@@ -20,6 +20,8 @@
       :items="items"
       @edit-item="editItem"
       @delete-item="deleteItem"
+      @create-item="createItem"
+      @update-item="updateItem"
     />
 
     <!-- NPCs Management -->
@@ -28,14 +30,19 @@
       :npcs="npcs"
       @edit-npc="editNPC"
       @delete-npc="deleteNPC"
+      @create-npc="createNPC"
+      @update-npc="updateNPC"
     />
 
     <!-- Quests Management -->
     <QuestsTab
       v-else-if="currentTab === 'quests'"
       :quests="quests"
+      :npcs="npcs"
       @edit-quest="editQuest"
       @delete-quest="deleteQuest"
+      @create-quest="createQuest"
+      @update-quest="updateQuest"
     />
 
     <!-- Roles Management -->
@@ -73,7 +80,7 @@ import QuestsTab from "./admin-panel/QuestsTab.vue";
 import RolesTab from "./admin-panel/RolesTab.vue";
 import ConfigsTab from "./admin-panel/ConfigsTab.vue";
 
-const { get, put, delete: del } = useApi();
+const { get, put, post, delete: del } = useApi();
 
 const tabs = [
   { id: "users", label: "Users" },
@@ -365,19 +372,114 @@ const editUser = (user: any) => {
 };
 
 const editItem = (item: any) => {
-  // TODO: Implement edit modal
   console.log("Edit item:", item);
-  alert("Tính năng sửa item đang được phát triển");
+  // Handled by ItemsTab component
+};
+
+const createItem = async (data: any) => {
+  try {
+    loading.value = true;
+    await post("/admin/items", data);
+    await fetchItems();
+    console.log("Item created successfully");
+  } catch (error: any) {
+    console.error("Error creating item:", error);
+    alert(
+      "Lỗi khi tạo item: " + (error.response?.data?.message || error.message)
+    );
+  } finally {
+    loading.value = false;
+  }
+};
+
+const updateItem = async (id: number, data: any) => {
+  try {
+    loading.value = true;
+    await put(`/admin/items/${id}`, data);
+    await fetchItems();
+    console.log("Item updated successfully");
+  } catch (error: any) {
+    console.error("Error updating item:", error);
+    alert(
+      "Lỗi khi cập nhật item: " + (error.response?.data?.message || error.message)
+    );
+  } finally {
+    loading.value = false;
+  }
 };
 
 const editNPC = (npc: any) => {
   console.log("Edit NPC:", npc);
-  alert("Tính năng sửa NPC đang được phát triển");
+  // Handled by NPCsTab component
+};
+
+const createNPC = async (data: any) => {
+  try {
+    loading.value = true;
+    await post("/admin/npcs", data);
+    await fetchNPCs();
+    console.log("NPC created successfully");
+  } catch (error: any) {
+    console.error("Error creating NPC:", error);
+    alert(
+      "Lỗi khi tạo NPC: " + (error.response?.data?.message || error.message)
+    );
+  } finally {
+    loading.value = false;
+  }
+};
+
+const updateNPC = async (id: number, data: any) => {
+  try {
+    loading.value = true;
+    await put(`/admin/npcs/${id}`, data);
+    await fetchNPCs();
+    console.log("NPC updated successfully");
+  } catch (error: any) {
+    console.error("Error updating NPC:", error);
+    alert(
+      "Lỗi khi cập nhật NPC: " + (error.response?.data?.message || error.message)
+    );
+  } finally {
+    loading.value = false;
+  }
 };
 
 const editQuest = (quest: any) => {
   console.log("Edit quest:", quest);
-  alert("Tính năng sửa quest đang được phát triển");
+  // Handled by QuestsTab component
+};
+
+const createQuest = async (data: any) => {
+  try {
+    loading.value = true;
+    await post("/admin/quests", data);
+    await fetchQuests();
+    console.log("Quest created successfully");
+  } catch (error: any) {
+    console.error("Error creating quest:", error);
+    alert(
+      "Lỗi khi tạo quest: " + (error.response?.data?.message || error.message)
+    );
+  } finally {
+    loading.value = false;
+  }
+};
+
+const updateQuest = async (id: number, data: any) => {
+  try {
+    loading.value = true;
+    await put(`/admin/quests/${id}`, data);
+    await fetchQuests();
+    console.log("Quest updated successfully");
+  } catch (error: any) {
+    console.error("Error updating quest:", error);
+    alert(
+      "Lỗi khi cập nhật quest: " + (error.response?.data?.message || error.message)
+    );
+  } finally {
+    loading.value = false;
+  }
 };
 
 const editRole = (role: any) => {

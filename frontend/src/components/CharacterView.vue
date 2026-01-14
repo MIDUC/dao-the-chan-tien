@@ -26,6 +26,9 @@
 
       <!-- Status Table -->
       <StatusTable :character-id="characterId" />
+
+      <!-- Equipment View -->
+      <EquipmentView :character-id="characterId" />
     </div>
   </div>
 </template>
@@ -38,6 +41,7 @@ import CharacterDisplay from "./character-view/CharacterDisplay.vue";
 import CharacterStats from "./character-view/CharacterStats.vue";
 import StatusTable from "./character-view/StatusTable.vue";
 import BreakthroughModal from "./character-view/BreakthroughModal.vue";
+import EquipmentView from "./equipment/EquipmentView.vue";
 
 interface Character {
   id: number;

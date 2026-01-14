@@ -21,11 +21,20 @@ import { OfflineCultivationModule } from './offline-cultivation/offline-cultivat
 import { SystemConfigModule } from './system-config/system-config.module';
 import { StatusLogsModule } from './status-logs/status-logs.module';
 import { RealmLevelsModule } from './realm-levels/realm-levels.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { UploadController } from './upload/upload.controller';
+import { QuestsModule } from './quests/quests.module';
+import { EquipmentModule } from './equipment/equipment.module';
+import { ItemsModule } from './items/items.module';
+import { QiModule } from './qi/qi.module';
+import { StatsModule } from './stats/stats.module';
+import { FitnessModule } from './fitness/fitness.module';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(databaseConfig()),
+    CloudinaryModule,
     UsersModule,
     CharactersModule,
     NpcsModule,
@@ -43,8 +52,14 @@ import { RealmLevelsModule } from './realm-levels/realm-levels.module';
     SystemConfigModule,
     StatusLogsModule,
     RealmLevelsModule,
+    QuestsModule,
+    EquipmentModule,
+    ItemsModule,
+    QiModule,
+    StatsModule,
+    FitnessModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UploadController], // <--- Đã sửa đúng tại đây
   providers: [AppService],
 })
 export class AppModule {}

@@ -57,6 +57,31 @@ export class Quest {
     unit?: string;
   };
 
+  // Điều kiện để hoàn thành quest (conditions)
+  @Column({ type: 'json', nullable: true })
+  conditions: {
+    // Primary stats requirements
+    min_luc_dao?: number;
+    min_can_cot?: number;
+    min_than_phap?: number;
+    min_ngo_tinh?: number;
+    min_dinh_luc?: number;
+    // Qi requirements
+    min_qi?: Array<{ qi_type: string; amount: number }>;
+    // Item requirements (must have in inventory)
+    required_items?: Array<{ item_id: number; quantity: number }>;
+    // Equipment requirements (must be equipped)
+    required_equipment?: Array<{ item_id: number; slot?: string }>;
+    // Realm level requirement
+    min_realm_level?: number;
+    // Quest prerequisites (must complete these quests first)
+    prerequisite_quests?: number[];
+    // Location requirement
+    required_location?: string;
+    // Time requirement (e.g., must be morning)
+    required_time?: string[];
+  };
+
   // Phần thưởng
   @Column({ type: 'json' })
   reward: {

@@ -113,6 +113,70 @@ export class Item {
   @Column({ default: 1 })
   required_level: number;
 
+  // Ngũ hành + Dị nguyên tố (Element) - Có thể có nhiều loại
+  // Ngũ Hành: kim, moc, thuy, hoa, tho
+  // Dị Nguyên Tố: loi (Lôi), bang (Băng), quang (Quang), am (Ám), phong (Phong), doc (Độc), thien (Thiên), dia (Địa)
+  @Column({ type: 'json', nullable: true })
+  element:
+    | (
+        | 'kim' // Kim (Metal)
+        | 'moc' // Mộc (Wood)
+        | 'thuy' // Thủy (Water)
+        | 'hoa' // Hỏa (Fire)
+        | 'tho' // Thổ (Earth)
+        | 'loi' // Lôi (Thunder/Lightning)
+        | 'bang' // Băng (Ice)
+        | 'quang' // Quang (Light)
+        | 'am' // Ám (Dark/Shadow)
+        | 'phong' // Phong (Wind)
+        | 'doc' // Độc (Poison)
+        | 'thien' // Thiên (Sky/Heaven)
+        | 'dia' // Địa (Earth - khác với Thổ)
+      )[]
+    | null;
+
+  // Qi bonus khi trang bị (JSON)
+  @Column({ type: 'json', nullable: true })
+  qi_bonus: {
+    qi_type?: string; // QiType
+    amount?: number; // Amount of Qi gained when equipped
+    per_minute?: number; // Qi regen per minute when equipped
+  }[];
+
+  // Effects (Tác dụng) cho Cổ Bảo - Buffs khi trang bị
+  @Column({ type: 'json', nullable: true })
+  artifact_effects: {
+    attack_bonus?: number; // Tăng tấn công
+    defense_bonus?: number; // Tăng phòng thủ
+    hp_bonus?: number; // Tăng HP
+    mp_bonus?: number; // Tăng MP
+    crit_chance?: number; // Tăng tỷ lệ bạo kích
+    crit_damage?: number; // Tăng sát thương bạo kích
+    speed_bonus?: number; // Tăng tốc độ
+    dodge_chance?: number; // Tăng tỷ lệ né tránh
+    exp_bonus?: number; // Tăng EXP gain
+    drop_rate_bonus?: number; // Tăng tỷ lệ rơi đồ
+    [key: string]: any;
+  };
+
+  // Penalties (Tác hại) cho Cổ Bảo - Debuffs khi trang bị
+  @Column({ type: 'json', nullable: true })
+  artifact_penalties: {
+    hp_loss_per_attack?: number; // Mất máu mỗi lần tấn công
+    mp_loss_per_skill?: number; // Mất MP mỗi lần dùng skill
+    hp_drain_per_second?: number; // Mất máu mỗi giây
+    mp_drain_per_second?: number; // Mất MP mỗi giây
+    defense_reduction?: number; // Giảm phòng thủ
+    speed_reduction?: number; // Giảm tốc độ
+    exp_reduction?: number; // Giảm EXP gain
+    stat_reduction?: {
+      strength?: number;
+      agility?: number;
+      wisdom?: number;
+    };
+    [key: string]: any;
+  };
+
   // Realm requirement (realm_level)
   @Column({ default: 1 })
   required_realm_level: number;
@@ -129,4 +193,3 @@ export class Item {
   @UpdateDateColumn()
   updated_at: Date;
 }
-

@@ -51,6 +51,8 @@ export class Inventory {
     durability?: number;
     sockets?: string[];
     hidden_options?: any;
+    effects?: any; // For ancient artifacts
+    penalties?: any; // For ancient artifacts
   };
 
   @CreateDateColumn()

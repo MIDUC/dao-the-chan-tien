@@ -35,15 +35,46 @@ export class Character {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 10 })
   base_exp_per_interval: number;
 
-  // Chỉ số cơ bản
+  // ========== Tầng Gốc (Primary Stats) - Gắn với Fitness ==========
   @Column({ default: 10 })
-  strength: number; // Thể Phách / Linh Lực
+  luc_dao: number; // Lực Đạo - Sức Mạnh (Physical Power)
 
   @Column({ default: 10 })
-  agility: number; // Thân Pháp / Thể Lực
+  can_cot: number; // Căn Cốt - Thể Chất (Constitution)
 
   @Column({ default: 10 })
-  wisdom: number; // Tâm Cảnh / Tinh Thần
+  than_phap: number; // Thân Pháp - Nhanh Nhẹn (Agility)
+
+  @Column({ default: 10 })
+  ngo_tinh: number; // Ngộ Tính - Trí Tuệ (Wisdom)
+
+  @Column({ default: 10 })
+  dinh_luc: number; // Định Lực - Ý Chí (Willpower)
+
+  // ========== Tầng Tiên Thiên (Hidden/Talent Stats) ==========
+  @Column({
+    type: 'enum',
+    enum: ['kim', 'moc', 'thuy', 'hoa', 'tho'],
+    default: 'thuy',
+  })
+  linh_can: 'kim' | 'moc' | 'thuy' | 'hoa' | 'tho'; // Linh Căn - Spirit Root (Element)
+
+  @Column({ default: 50 })
+  phuc_duyen: number; // Phúc Duyên - Luck (Hidden stat, 0-100)
+
+  @Column({ default: 50 })
+  tam_canh: number; // Tâm Cảnh - State of Mind (0-100, affects cultivation stability)
+
+  // ========== Legacy Stats (for backward compatibility) ==========
+  // These will be calculated from Primary Stats
+  @Column({ default: 10 })
+  strength: number; // Deprecated: Use luc_dao
+
+  @Column({ default: 10 })
+  agility: number; // Deprecated: Use than_phap
+
+  @Column({ default: 10 })
+  wisdom: number; // Deprecated: Use ngo_tinh
 
   // Last login time for offline cultivation calculation
   @Column({ type: 'datetime', nullable: true })

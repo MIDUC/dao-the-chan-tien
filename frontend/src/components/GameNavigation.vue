@@ -143,6 +143,12 @@ const MAIN_CATEGORIES: MainCategory[] = [
             viewId: "character",
           },
           {
+            id: "trang-bi",
+            label: "Trang Bị",
+            icon: Sword,
+            viewId: "equipment",
+          },
+          {
             id: "thien-phu",
             label: "Thiên Phú",
             icon: Sprout,

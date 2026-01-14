@@ -116,9 +116,32 @@ export const useAuth = () => {
     try {
       // api is axios instance, so response.data contains the actual data
       const response = await api.get('/auth/me');
-      authState.value.user = response.data;
+      console.log('checkAuth response:', response.data);
+      
+      // Response là User object với characters array
+      if (response.data) {
+        const userData = response.data;
+        authState.value.user = userData;
+        
+        // Lấy character đầu tiên từ characters array
+        if (userData.characters && Array.isArray(userData.characters) && userData.characters.length > 0) {
+          authState.value.character = userData.characters[0];
+          console.log('Character found in user.characters:', authState.value.character);
+        } else {
+          console.warn('No characters found in user data:', userData);
+          authState.value.character = null;
+        }
+        
+        console.log('AuthState updated:', {
+          user: authState.value.user,
+          character: authState.value.character,
+          hasCharacters: !!userData.characters,
+          charactersCount: userData.characters?.length || 0,
+        });
+      }
       return true;
     } catch (error) {
+      console.error('checkAuth error:', error);
       logout();
       return false;
     }
