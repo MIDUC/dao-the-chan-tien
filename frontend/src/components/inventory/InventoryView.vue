@@ -8,77 +8,91 @@
           {{ usedSlots }} / {{ maxSlots }} ô
         </div>
       </div>
-      
-      <div v-if="loading" class="text-gray-400 animate-pulse">
-        Đang tải...
-      </div>
+
+      <div v-if="loading" class="text-gray-400 animate-pulse">Đang tải...</div>
 
       <div v-else class="space-y-4">
         <div class="grid grid-cols-5 gap-2">
-        <div
-          v-for="(slot, index) in inventorySlots"
-          :key="index"
-          @click="selectSlot(slot)"
-          class="aspect-square bg-gray-700/50 border-2 rounded-lg cursor-pointer transition-all hover:bg-gray-700/70 relative"
-          :class="[
-            slot.inventoryItem 
-              ? getRaritySlotClass(slot.inventoryItem.item.rarity, selectedSlot?.slotIndex === index)
-              : selectedSlot?.slotIndex === index
+          <div
+            v-for="(slot, index) in inventorySlots"
+            :key="index"
+            @click="selectSlot(slot)"
+            class="aspect-square bg-gray-700/50 border-2 rounded-lg cursor-pointer transition-all hover:bg-gray-700/70 relative"
+            :class="[
+              slot.inventoryItem
+                ? getRaritySlotClass(
+                    slot.inventoryItem.item.rarity,
+                    selectedSlot?.slotIndex === index
+                  )
+                : selectedSlot?.slotIndex === index
                 ? 'border-cyan-300 shadow-lg shadow-cyan-300/30'
-                : 'border-gray-600'
-          ]"
-          :style="slot.inventoryItem ? getRarityGlowStyle(slot.inventoryItem.item.rarity, selectedSlot?.slotIndex === index) : ''"
-        >
-          <!-- Item in slot -->
-          <div v-if="slot.inventoryItem" class="w-full h-full flex flex-col items-center justify-center p-1 relative">
-            <!-- Item image -->
-            <img
-              v-if="getItemImageUrl(slot.inventoryItem.item)"
-              :src="getItemImageUrl(slot.inventoryItem.item)"
-              :alt="slot.inventoryItem.item.name"
-              class="w-full h-full object-contain rounded"
-              @error="handleImageError"
-            />
-            <!-- Fallback icon if image fails to load -->
+                : 'border-gray-600',
+            ]"
+            :style="
+              slot.inventoryItem
+                ? getRarityGlowStyle(
+                    slot.inventoryItem.item.rarity,
+                    selectedSlot?.slotIndex === index
+                  )
+                : ''
+            "
+          >
+            <!-- Item in slot -->
+            <div
+              v-if="slot.inventoryItem"
+              class="w-full h-full flex flex-col items-center justify-center p-1 relative"
+            >
+              <!-- Item image -->
+              <img
+                v-if="getItemImageUrl(slot.inventoryItem.item)"
+                :src="getItemImageUrl(slot.inventoryItem.item)"
+                :alt="slot.inventoryItem.item.name"
+                class="w-full h-full object-contain rounded"
+                @error="handleImageError"
+              />
+              <!-- Fallback icon if image fails to load -->
+              <div
+                v-else
+                class="w-full h-full flex items-center justify-center text-4xl"
+                :class="getRarityColor(slot.inventoryItem.item.rarity)"
+              >
+                {{ getItemIcon(slot.inventoryItem.item) }}
+              </div>
+
+              <!-- Quantity badge -->
+              <div
+                v-if="slot.inventoryItem.quantity > 1"
+                class="absolute bottom-0 right-0 bg-gray-900/90 text-white text-xs px-1.5 py-0.5 rounded-tl"
+              >
+                {{ slot.inventoryItem.quantity }}
+              </div>
+
+              <!-- Lock icon -->
+              <div
+                v-if="slot.locked"
+                class="absolute top-1 right-1 text-gray-400 text-xs"
+              >
+                🔒
+              </div>
+
+              <!-- Arrow indicator -->
+              <div
+                v-if="slot.hasIndicator"
+                class="absolute top-1 left-1 text-red-500 text-xs"
+              >
+                ⬇️
+              </div>
+            </div>
+
+            <!-- Empty slot -->
             <div
               v-else
-              class="w-full h-full flex items-center justify-center text-4xl"
-              :class="getRarityColor(slot.inventoryItem.item.rarity)"
+              class="w-full h-full flex items-center justify-center text-gray-500 text-2xl"
             >
-              {{ getItemIcon(slot.inventoryItem.item) }}
-            </div>
-            
-            <!-- Quantity badge -->
-            <div
-              v-if="slot.inventoryItem.quantity > 1"
-              class="absolute bottom-0 right-0 bg-gray-900/90 text-white text-xs px-1.5 py-0.5 rounded-tl"
-            >
-              {{ slot.inventoryItem.quantity }}
-            </div>
-
-            <!-- Lock icon -->
-            <div
-              v-if="slot.locked"
-              class="absolute top-1 right-1 text-gray-400 text-xs"
-            >
-              🔒
-            </div>
-
-            <!-- Arrow indicator -->
-            <div
-              v-if="slot.hasIndicator"
-              class="absolute top-1 left-1 text-red-500 text-xs"
-            >
-              ⬇️
+              <span v-if="slot.locked">🔒</span>
+              <span v-else>+</span>
             </div>
           </div>
-
-          <!-- Empty slot -->
-          <div v-else class="w-full h-full flex items-center justify-center text-gray-500 text-2xl">
-            <span v-if="slot.locked">🔒</span>
-            <span v-else>+</span>
-          </div>
-        </div>
         </div>
 
         <!-- Expand Inventory Button -->
@@ -173,19 +187,25 @@
                 v-if="selectedSlot.inventoryItem.item.equipment_stats.strength"
                 class="text-red-300"
               >
-                Sức mạnh: +{{ selectedSlot.inventoryItem.item.equipment_stats.strength }}
+                Sức mạnh: +{{
+                  selectedSlot.inventoryItem.item.equipment_stats.strength
+                }}
               </div>
               <div
                 v-if="selectedSlot.inventoryItem.item.equipment_stats.agility"
                 class="text-green-300"
               >
-                Nhanh nhẹn: +{{ selectedSlot.inventoryItem.item.equipment_stats.agility }}
+                Nhanh nhẹn: +{{
+                  selectedSlot.inventoryItem.item.equipment_stats.agility
+                }}
               </div>
               <div
                 v-if="selectedSlot.inventoryItem.item.equipment_stats.wisdom"
                 class="text-blue-300"
               >
-                Trí tuệ: +{{ selectedSlot.inventoryItem.item.equipment_stats.wisdom }}
+                Trí tuệ: +{{
+                  selectedSlot.inventoryItem.item.equipment_stats.wisdom
+                }}
               </div>
               <div
                 v-if="selectedSlot.inventoryItem.item.equipment_stats.hp"
@@ -197,19 +217,27 @@
                 v-if="selectedSlot.inventoryItem.item.equipment_stats.defense"
                 class="text-purple-300"
               >
-                Phòng thủ: +{{ selectedSlot.inventoryItem.item.equipment_stats.defense }}
+                Phòng thủ: +{{
+                  selectedSlot.inventoryItem.item.equipment_stats.defense
+                }}
               </div>
             </div>
           </div>
 
           <!-- Sell Price -->
           <div
-            v-if="selectedSlot.inventoryItem.item.sellable && selectedSlot.inventoryItem.item.sell_price > 0"
+            v-if="
+              selectedSlot.inventoryItem.item.sellable &&
+              selectedSlot.inventoryItem.item.sell_price > 0
+            "
             class="mt-4 pt-4 border-t border-gray-700"
           >
             <div class="text-gray-400">Giá bán:</div>
             <div class="text-yellow-400 font-semibold">
-              {{ formatNumber(selectedSlot.inventoryItem.item.sell_price) }} Linh Thạch
+              {{
+                formatNumber(selectedSlot.inventoryItem.item.sell_price)
+              }}
+              Linh Thạch
             </div>
           </div>
 
@@ -223,10 +251,13 @@
             >
               Trang Bị
             </button>
-            
+
             <!-- Use Button for Consumables -->
             <button
-              v-else-if="selectedSlot.inventoryItem.item.item_type === 'consumable' && selectedSlot.inventoryItem.item.usable"
+              v-else-if="
+                selectedSlot.inventoryItem.item.item_type === 'consumable' &&
+                selectedSlot.inventoryItem.item.usable
+              "
               @click="useItem"
               class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-semibold"
             >
@@ -261,10 +292,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { api } from '../../composables/useApi';
-import { formatNumber } from '../../utils/formatNumber';
-import EquipSlotModal from './EquipSlotModal.vue';
+import { ref, onMounted, computed } from "vue";
+import { api } from "../../composables/useApi";
+import { formatNumber } from "../../utils/formatNumber";
+import EquipSlotModal from "./EquipSlotModal.vue";
 
 interface Item {
   id: number;
@@ -322,12 +353,14 @@ const usedSlots = computed(() => {
 // Create slots based on max_inventory_slots
 const inventorySlots = computed<InventorySlot[]>(() => {
   const slots: InventorySlot[] = [];
-  
+
   for (let i = 0; i < maxSlots.value; i++) {
     const item = inventoryItems.value.find(
-      (inv) => inv.slot_position === i || (!inv.slot_position && i === inventoryItems.value.indexOf(inv))
+      (inv) =>
+        inv.slot_position === i ||
+        (!inv.slot_position && i === inventoryItems.value.indexOf(inv))
     );
-    
+
     slots.push({
       slotIndex: i,
       inventoryItem: item || null,
@@ -335,7 +368,7 @@ const inventorySlots = computed<InventorySlot[]>(() => {
       hasIndicator: false, // Can be set based on item status
     });
   }
-  
+
   return slots;
 });
 
@@ -345,17 +378,19 @@ const fetchCharacter = async () => {
     character.value = response.data;
     maxSlots.value = character.value?.max_inventory_slots || 20;
   } catch (error) {
-    console.error('Error fetching character:', error);
+    console.error("Error fetching character:", error);
   }
 };
 
 const fetchInventory = async () => {
   try {
     loading.value = true;
-    const response = await api.get(`/characters/${props.characterId}/inventory`);
+    const response = await api.get(
+      `/characters/${props.characterId}/inventory`
+    );
     inventoryItems.value = response.data || [];
   } catch (error) {
-    console.error('Error fetching inventory:', error);
+    console.error("Error fetching inventory:", error);
     inventoryItems.value = [];
   } finally {
     loading.value = false;
@@ -364,19 +399,19 @@ const fetchInventory = async () => {
 
 const useItem = async () => {
   if (!selectedSlot.value?.inventoryItem) return;
-  
+
   try {
-    const response = await api.post('/items/use', {
+    const response = await api.post("/items/use", {
       inventoryId: selectedSlot.value.inventoryItem.id,
       quantity: 1,
     });
-    
+
     if (response.data.success) {
       await fetchInventory();
       selectedSlot.value = null;
     }
   } catch (error) {
-    console.error('Error using item:', error);
+    console.error("Error using item:", error);
   }
 };
 
@@ -390,23 +425,26 @@ const handleEquipped = async () => {
 
 const expandInventory = async () => {
   if (expanding.value) return;
-  
+
   try {
     expanding.value = true;
-    const response = await api.post(`/characters/${props.characterId}/inventory/expand`, {
-      slotsToAdd: 5,
-    });
-    
+    const response = await api.post(
+      `/characters/${props.characterId}/inventory/expand`,
+      {
+        slotsToAdd: 5,
+      }
+    );
+
     if (response.data.success) {
       // Update max slots
       maxSlots.value = response.data.character.max_inventory_slots;
       alert(response.data.message);
     } else {
-      alert(response.data.message || 'Không thể mở rộng túi đồ');
+      alert(response.data.message || "Không thể mở rộng túi đồ");
     }
   } catch (error: any) {
-    console.error('Error expanding inventory:', error);
-    alert(error.response?.data?.message || 'Có lỗi xảy ra khi mở rộng túi đồ');
+    console.error("Error expanding inventory:", error);
+    alert(error.response?.data?.message || "Có lỗi xảy ra khi mở rộng túi đồ");
   } finally {
     expanding.value = false;
   }
@@ -425,13 +463,16 @@ const getItemImageUrl = (item: Item): string | undefined => {
   }
 
   // If it's already a full URL, return it
-  if (item.icon_url.startsWith('http://') || item.icon_url.startsWith('https://')) {
+  if (
+    item.icon_url.startsWith("http://") ||
+    item.icon_url.startsWith("https://")
+  ) {
     return item.icon_url;
   }
 
   // If it's a relative path, construct full URL
   // Backend serves static files from /public/
-  const apiBaseUrl = 'http://localhost:3000';
+  const apiBaseUrl = "http://localhost:3000";
   return `${apiBaseUrl}/public/items/${item.icon_url}`;
 };
 
@@ -439,105 +480,119 @@ const handleImageError = (event: Event) => {
   // Hide broken image and show fallback
   const img = event.target as HTMLImageElement;
   if (img) {
-    img.style.display = 'none';
+    img.style.display = "none";
   }
 };
 
 const getItemIcon = (item: Item): string => {
   // Return emoji or icon based on item type (fallback)
   const iconMap: Record<string, string> = {
-    consumable: '💊',
-    equipment: '⚔️',
-    material: '🌿',
-    quest_item: '📜',
-    special: '✨',
+    consumable: "💊",
+    equipment: "⚔️",
+    material: "🌿",
+    quest_item: "📜",
+    special: "✨",
   };
-  
-  return iconMap[item.item_type] || '📦';
+
+  return iconMap[item.item_type] || "📦";
 };
 
 const getRarityColor = (rarity: string): string => {
   const colorMap: Record<string, string> = {
-    common: 'text-gray-300',
-    uncommon: 'text-green-300',
-    rare: 'text-blue-300',
-    epic: 'text-purple-300',
-    legendary: 'text-yellow-300',
-    mythic: 'text-orange-300',
+    common: "text-gray-300",
+    uncommon: "text-green-300",
+    rare: "text-blue-300",
+    epic: "text-purple-300",
+    legendary: "text-yellow-300",
+    mythic: "text-orange-300",
   };
-  return colorMap[rarity] || 'text-gray-300';
+  return colorMap[rarity] || "text-gray-300";
 };
 
 const getRarityBorder = (rarity: string): string => {
   const borderMap: Record<string, string> = {
-    common: 'border-gray-400',
-    uncommon: 'border-green-400',
-    rare: 'border-blue-400',
-    epic: 'border-purple-400',
-    legendary: 'border-yellow-400',
-    mythic: 'border-red-400',
+    common: "border-gray-400",
+    uncommon: "border-green-400",
+    rare: "border-blue-400",
+    epic: "border-purple-400",
+    legendary: "border-yellow-400",
+    mythic: "border-red-400",
   };
-  return borderMap[rarity] || 'border-gray-400';
+  return borderMap[rarity] || "border-gray-400";
 };
 
 const getRaritySlotClass = (rarity: string, isSelected: boolean): string => {
-  const baseClasses = 'border-2 rounded-lg';
+  const baseClasses = "border-2 rounded-lg";
   const glowClasses: Record<string, string> = {
-    common: isSelected 
-      ? 'border-gray-300 shadow-lg shadow-gray-300/50' 
-      : 'border-gray-400 shadow-md shadow-gray-400/30',
+    common: isSelected
+      ? "border-gray-300 shadow-lg shadow-gray-300/50"
+      : "border-gray-400 shadow-md shadow-gray-400/30",
     uncommon: isSelected
-      ? 'border-green-400 shadow-lg shadow-green-400/50'
-      : 'border-green-500 shadow-md shadow-green-500/40',
+      ? "border-green-400 shadow-lg shadow-green-400/50"
+      : "border-green-500 shadow-md shadow-green-500/40",
     rare: isSelected
-      ? 'border-blue-400 shadow-lg shadow-blue-400/50'
-      : 'border-blue-500 shadow-md shadow-blue-500/40',
+      ? "border-blue-400 shadow-lg shadow-blue-400/50"
+      : "border-blue-500 shadow-md shadow-blue-500/40",
     epic: isSelected
-      ? 'border-purple-400 shadow-lg shadow-purple-400/50'
-      : 'border-purple-500 shadow-md shadow-purple-500/40',
+      ? "border-purple-400 shadow-lg shadow-purple-400/50"
+      : "border-purple-500 shadow-md shadow-purple-500/40",
     legendary: isSelected
-      ? 'border-yellow-400 shadow-lg shadow-yellow-400/60'
-      : 'border-yellow-500 shadow-md shadow-yellow-500/50',
+      ? "border-yellow-400 shadow-lg shadow-yellow-400/60"
+      : "border-yellow-500 shadow-md shadow-yellow-500/50",
     mythic: isSelected
-      ? 'border-red-400 shadow-lg shadow-red-400/60'
-      : 'border-red-500 shadow-md shadow-red-500/50',
+      ? "border-red-400 shadow-lg shadow-red-400/60"
+      : "border-red-500 shadow-md shadow-red-500/50",
   };
   return `${baseClasses} ${glowClasses[rarity] || glowClasses.common}`;
 };
 
-const getRarityGlowStyle = (rarity: string, isSelected: boolean = false): string => {
+const getRarityGlowStyle = (
+  rarity: string,
+  isSelected: boolean = false
+): string => {
   const intensity = isSelected ? 1.5 : 1;
   const glowMap: Record<string, string> = {
-    common: `box-shadow: 0 0 ${10 * intensity}px rgba(156, 163, 175, ${0.3 * intensity}), inset 0 0 ${5 * intensity}px rgba(156, 163, 175, 0.2);`,
-    uncommon: `box-shadow: 0 0 ${15 * intensity}px rgba(34, 197, 94, ${0.5 * intensity}), inset 0 0 ${8 * intensity}px rgba(34, 197, 94, 0.3);`,
-    rare: `box-shadow: 0 0 ${15 * intensity}px rgba(59, 130, 246, ${0.5 * intensity}), inset 0 0 ${8 * intensity}px rgba(59, 130, 246, 0.3);`,
-    epic: `box-shadow: 0 0 ${20 * intensity}px rgba(168, 85, 247, ${0.6 * intensity}), inset 0 0 ${10 * intensity}px rgba(168, 85, 247, 0.4);`,
-    legendary: `box-shadow: 0 0 ${25 * intensity}px rgba(234, 179, 8, ${0.7 * intensity}), inset 0 0 ${12 * intensity}px rgba(234, 179, 8, 0.5);`,
-    mythic: `box-shadow: 0 0 ${30 * intensity}px rgba(239, 68, 68, ${0.8 * intensity}), inset 0 0 ${15 * intensity}px rgba(239, 68, 68, 0.6);`,
+    common: `box-shadow: 0 0 ${10 * intensity}px rgba(156, 163, 175, ${
+      0.3 * intensity
+    }), inset 0 0 ${5 * intensity}px rgba(156, 163, 175, 0.2);`,
+    uncommon: `box-shadow: 0 0 ${15 * intensity}px rgba(34, 197, 94, ${
+      0.5 * intensity
+    }), inset 0 0 ${8 * intensity}px rgba(34, 197, 94, 0.3);`,
+    rare: `box-shadow: 0 0 ${15 * intensity}px rgba(59, 130, 246, ${
+      0.5 * intensity
+    }), inset 0 0 ${8 * intensity}px rgba(59, 130, 246, 0.3);`,
+    epic: `box-shadow: 0 0 ${20 * intensity}px rgba(168, 85, 247, ${
+      0.6 * intensity
+    }), inset 0 0 ${10 * intensity}px rgba(168, 85, 247, 0.4);`,
+    legendary: `box-shadow: 0 0 ${25 * intensity}px rgba(234, 179, 8, ${
+      0.7 * intensity
+    }), inset 0 0 ${12 * intensity}px rgba(234, 179, 8, 0.5);`,
+    mythic: `box-shadow: 0 0 ${30 * intensity}px rgba(239, 68, 68, ${
+      0.8 * intensity
+    }), inset 0 0 ${15 * intensity}px rgba(239, 68, 68, 0.6);`,
   };
-  const result = glowMap[rarity as keyof typeof glowMap];
-  return result ?? glowMap.common;
+  return (glowMap[rarity] ?? glowMap.common) as string;
 };
 
 const getRarityLabel = (rarity: string): string => {
   const labelMap: Record<string, string> = {
-    common: 'Thường',
-    uncommon: 'Không thường',
-    rare: 'Hiếm',
-    epic: 'Sử thi',
-    legendary: 'Huyền thoại',
-    mythic: 'Thần thoại',
+    common: "Thường",
+    uncommon: "Không thường",
+    rare: "Hiếm",
+    epic: "Sử thi",
+    legendary: "Huyền thoại",
+    mythic: "Thần thoại",
   };
   return labelMap[rarity] || rarity;
 };
 
 const getItemTypeLabel = (type: string): string => {
   const labelMap: Record<string, string> = {
-    consumable: 'Vật phẩm tiêu hao',
-    equipment: 'Trang bị',
-    material: 'Nguyên liệu',
-    quest_item: 'Vật phẩm nhiệm vụ',
-    special: 'Đặc biệt',
+    consumable: "Vật phẩm tiêu hao",
+    equipment: "Trang bị",
+    material: "Nguyên liệu",
+    quest_item: "Vật phẩm nhiệm vụ",
+    special: "Đặc biệt",
   };
   return labelMap[type] || type;
 };
@@ -551,4 +606,3 @@ onMounted(async () => {
 <style scoped>
 /* Additional styles if needed */
 </style>
-
