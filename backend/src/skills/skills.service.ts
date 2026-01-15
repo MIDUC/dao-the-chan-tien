@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Skill } from '../entities/skill.entity';
+import { Skill, DamageFormula } from '../entities/skill.entity';
 import { CharacterSkill } from '../entities/character-skill.entity';
 import { Character } from '../entities/character.entity';
-import { Inventory } from '../entities/inventory.entity';
+import { ElementsService } from '../elements/elements.service';
+import { ElementType } from '../entities/character-element.entity';
 
 @Injectable()
 export class SkillsService {
@@ -15,8 +16,7 @@ export class SkillsService {
     private characterSkillRepository: Repository<CharacterSkill>,
     @InjectRepository(Character)
     private characterRepository: Repository<Character>,
-    @InjectRepository(Inventory)
-    private inventoryRepository: Repository<Inventory>,
+    private elementsService: ElementsService,
   ) {}
 
   /**
@@ -25,155 +25,134 @@ export class SkillsService {
   async findAll(): Promise<Skill[]> {
     return this.skillRepository.find({
       where: { is_active: true },
-      order: { category: 'ASC', id: 'ASC' },
+      order: { name: 'ASC' },
     });
   }
 
   /**
    * Get skill by ID
    */
-  async findOne(id: number): Promise<Skill | null> {
-    return this.skillRepository.findOne({
-      where: { id, is_active: true },
-    });
+  async findOne(id: number): Promise<Skill> {
+    const skill = await this.skillRepository.findOne({ where: { id } });
+    if (!skill) {
+      throw new NotFoundException(`Skill with ID ${id} not found`);
+    }
+    return skill;
   }
 
   /**
-   * Get character skills
+   * Get character's skills
    */
   async getCharacterSkills(characterId: number): Promise<CharacterSkill[]> {
     return this.characterSkillRepository.find({
       where: { character_id: characterId },
       relations: ['skill'],
+      order: { created_at: 'DESC' },
     });
   }
 
   /**
-   * Unlock skill for character
+   * Learn a skill
    */
-  async unlockSkill(
-    characterId: number,
-    skillId: number,
-  ): Promise<{ success: boolean; message: string; characterSkill?: CharacterSkill }> {
-    const skill = await this.findOne(skillId);
-    if (!skill) {
-      return { success: false, message: 'Skill not found' };
+  async learnSkill(characterId: number, skillId: number): Promise<CharacterSkill> {
+    const character = await this.characterRepository.findOne({
+      where: { id: characterId },
+    });
+    if (!character) {
+      throw new NotFoundException(`Character with ID ${characterId} not found`);
     }
 
-    // Check if already unlocked
+    const skill = await this.findOne(skillId);
+
+    // Check if character meets level requirement
+    if (character.realm_level < skill.min_level) {
+      throw new Error(`Character level too low. Required: ${skill.min_level}`);
+    }
+
+    // Check if already learned
     const existing = await this.characterSkillRepository.findOne({
       where: { character_id: characterId, skill_id: skillId },
     });
 
-    if (existing && existing.is_unlocked) {
-      return { success: false, message: 'Skill already unlocked', characterSkill: existing };
+    if (existing) {
+      return existing;
     }
 
-    // Check requirements
-    const character = await this.characterRepository.findOne({
-      where: { id: characterId },
+    const characterSkill = this.characterSkillRepository.create({
+      character_id: characterId,
+      skill_id: skillId,
+      level: 1,
+      exp: 0,
+      is_unlocked: true,
+      learned_at: new Date(),
+      unlocked_at: new Date(),
     });
 
-    if (!character) {
-      return { success: false, message: 'Character not found' };
-    }
-
-    // Check realm level
-    if (skill.requirements.realm_level && character.realm_level < skill.requirements.realm_level) {
-      return { success: false, message: 'Realm level requirement not met' };
-    }
-
-    // Check prerequisite skills
-    if (skill.requirements.prerequisite_skill_ids && skill.requirements.prerequisite_skill_ids.length > 0) {
-      const prerequisites = await this.characterSkillRepository.find({
-        where: {
-          character_id: characterId,
-          skill_id: skill.requirements.prerequisite_skill_ids[0],
-          is_unlocked: true,
-        },
-      });
-
-      if (prerequisites.length === 0) {
-        return { success: false, message: 'Prerequisite skills not unlocked' };
-      }
-    }
-
-    // Check item cost
-    if (skill.requirements.item_cost && skill.requirements.item_cost.length > 0) {
-      for (const cost of skill.requirements.item_cost) {
-        const inventory = await this.inventoryRepository.findOne({
-          where: { character_id: characterId, item_id: cost.item_id },
-        });
-
-        if (!inventory || inventory.quantity < cost.quantity) {
-          return { success: false, message: `Not enough items: ${cost.item_id}` };
-        }
-      }
-
-      // Deduct items
-      for (const cost of skill.requirements.item_cost) {
-        const inventory = await this.inventoryRepository.findOne({
-          where: { character_id: characterId, item_id: cost.item_id },
-        });
-
-        if (inventory) {
-          inventory.quantity -= cost.quantity;
-          if (inventory.quantity === 0) {
-            await this.inventoryRepository.remove(inventory);
-          } else {
-            await this.inventoryRepository.save(inventory);
-          }
-        }
-      }
-    }
-
-    // Unlock skill
-    let characterSkill = existing;
-    if (!characterSkill) {
-      characterSkill = this.characterSkillRepository.create({
-        character_id: characterId,
-        skill_id: skillId,
-        is_unlocked: true,
-        unlocked_at: new Date(),
-        level: 1,
-        exp: 0,
-      });
-    } else {
-      characterSkill.is_unlocked = true;
-      characterSkill.unlocked_at = new Date();
-    }
-
-    const saved = await this.characterSkillRepository.save(characterSkill);
-    return { success: true, message: 'Skill unlocked successfully', characterSkill: saved };
+    return this.characterSkillRepository.save(characterSkill);
   }
 
   /**
-   * Level up skill
+   * Calculate skill damage
    */
-  async levelUpSkill(
+  async calculateSkillDamage(
     characterId: number,
     skillId: number,
-  ): Promise<{ success: boolean; message: string; characterSkill?: CharacterSkill }> {
+  ): Promise<{ damage: number; breakdown: any[] }> {
+    const character = await this.characterRepository.findOne({
+      where: { id: characterId },
+    });
+    if (!character) {
+      throw new NotFoundException(`Character with ID ${characterId} not found`);
+    }
+
+    const skill = await this.findOne(skillId);
     const characterSkill = await this.characterSkillRepository.findOne({
       where: { character_id: characterId, skill_id: skillId },
-      relations: ['skill'],
     });
 
-    if (!characterSkill || !characterSkill.is_unlocked) {
-      return { success: false, message: 'Skill not unlocked' };
+    if (!characterSkill) {
+      throw new NotFoundException('Character has not learned this skill');
     }
 
-    const skill = characterSkill.skill;
-    if (characterSkill.level >= skill.max_level) {
-      return { success: false, message: 'Skill already at max level' };
+    let totalDamage = 0;
+    const breakdown: any[] = [];
+
+    for (const formula of skill.damage_formula) {
+      let value = 0;
+
+      if (formula.stat) {
+        // Get stat value from character
+        const statMap: Record<string, number> = {
+          luc_dao: character.luc_dao,
+          can_cot: character.can_cot,
+          than_phap: character.than_phap,
+          ngo_tinh: character.ngo_tinh,
+          dinh_luc: character.dinh_luc,
+        };
+        value = statMap[formula.stat] || 0;
+      } else if (formula.element) {
+        // Get element value
+        value = await this.elementsService.getElementValue(characterId, formula.element);
+      }
+
+      const damage = value * (formula.multiplier / 100);
+      totalDamage += damage;
+
+      breakdown.push({
+        source: formula.stat || formula.element,
+        value,
+        multiplier: formula.multiplier,
+        damage,
+      });
     }
 
-    // TODO: Check EXP requirement for level up
-    // For now, just level up
-    characterSkill.level += 1;
-    const saved = await this.characterSkillRepository.save(characterSkill);
+    // Apply skill level multiplier
+    const levelMultiplier = 1 + (characterSkill.level - 1) * 0.1; // 10% per level
+    totalDamage *= levelMultiplier;
 
-    return { success: true, message: 'Skill leveled up', characterSkill: saved };
+    return {
+      damage: Math.floor(totalDamage),
+      breakdown,
+    };
   }
 }
-

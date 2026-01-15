@@ -9,35 +9,20 @@ import {
   ParseIntPipe,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SkillsService } from './skills.service';
+import { ElementsService } from './elements.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ElementType } from '../entities/character-element.entity';
 
-@Controller('skills')
-export class SkillsController {
-  constructor(private readonly skillsService: SkillsService) {}
-
-  /**
-   * Get all skills
-   */
-  @Get()
-  async findAll() {
-    return this.skillsService.findAll();
-  }
+@Controller('elements')
+export class ElementsController {
+  constructor(private readonly elementsService: ElementsService) {}
 
   /**
-   * Get skill by ID
-   */
-  @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.skillsService.findOne(id);
-  }
-
-  /**
-   * Get character's skills
+   * Get character's elements
    */
   @Get('character/:characterId')
   @UseGuards(JwtAuthGuard)
-  async getCharacterSkills(
+  async getCharacterElements(
     @Param('characterId', ParseIntPipe) characterId: number,
     @Request() req,
   ) {
@@ -45,40 +30,44 @@ export class SkillsController {
     if (userCharacterId && userCharacterId !== characterId) {
       throw new UnauthorizedException('Character does not belong to user');
     }
-    return this.skillsService.getCharacterSkills(characterId);
+    return this.elementsService.getCharacterElements(characterId);
   }
 
   /**
-   * Learn a skill
+   * Use element item from inventory to upgrade element
    */
-  @Post('character/:characterId/learn')
+  @Post('character/:characterId/use-item')
   @UseGuards(JwtAuthGuard)
-  async learnSkill(
+  async useElementItem(
     @Param('characterId', ParseIntPipe) characterId: number,
-    @Body() body: { skillId: number },
+    @Body() body: { elementType: ElementType; inventoryId: number },
     @Request() req,
   ) {
     const userCharacterId = req.user.character?.id;
     if (userCharacterId && userCharacterId !== characterId) {
       throw new UnauthorizedException('Character does not belong to user');
     }
-    return this.skillsService.learnSkill(characterId, body.skillId);
+    return this.elementsService.useElementItem(
+      characterId,
+      body.elementType,
+      body.inventoryId,
+    );
   }
 
   /**
-   * Calculate skill damage
+   * Get element items from character inventory
    */
-  @Get('character/:characterId/:skillId/damage')
+  @Get('character/:characterId/items')
   @UseGuards(JwtAuthGuard)
-  async calculateDamage(
+  async getElementItems(
     @Param('characterId', ParseIntPipe) characterId: number,
-    @Param('skillId', ParseIntPipe) skillId: number,
     @Request() req,
   ) {
     const userCharacterId = req.user.character?.id;
     if (userCharacterId && userCharacterId !== characterId) {
       throw new UnauthorizedException('Character does not belong to user');
     }
-    return this.skillsService.calculateSkillDamage(characterId, skillId);
+    return this.elementsService.getElementItems(characterId);
   }
 }
+

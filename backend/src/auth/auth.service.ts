@@ -7,6 +7,7 @@ import { User } from '../entities/user.entity';
 import { Character } from '../entities/character.entity';
 import { CurrencyService } from '../currency/currency.service';
 import { CurrencyType } from '../entities/currency.entity';
+import { TalentsService } from '../talents/talents.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private characterRepository: Repository<Character>,
     private jwtService: JwtService,
     private currencyService: CurrencyService,
+    private talentsService: TalentsService,
   ) {}
 
   /**
@@ -27,6 +29,7 @@ export class AuthService {
     email: string,
     password: string,
     characterName: string,
+    talentId?: number,
   ): Promise<{ user: User; character: Character; token: string }> {
     // Check if user exists
     const existingUser = await this.userRepository.findOne({
@@ -73,6 +76,20 @@ export class AuthService {
 
     // Initialize currencies
     await this.currencyService.initializeCharacterCurrencies(savedCharacter.id);
+
+    // Add starter talent if provided
+    if (talentId) {
+      try {
+        await this.talentsService.addTalentToCharacter(
+          savedCharacter.id,
+          talentId,
+          'registration',
+        );
+      } catch (error) {
+        console.error('Error adding starter talent:', error);
+        // Don't fail registration if talent addition fails
+      }
+    }
 
     // Generate JWT token
     const token = this.jwtService.sign({

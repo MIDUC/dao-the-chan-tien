@@ -16,6 +16,9 @@ import FriendsList from "../components/friends/FriendsList.vue";
 import NotificationsList from "../components/notifications/NotificationsList.vue";
 import InventoryView from "../components/inventory/InventoryView.vue";
 import EquipmentView from "../components/equipment/EquipmentView.vue";
+import TalentsView from "../components/talents/TalentsView.vue";
+import ElementsView from "../components/elements/ElementsView.vue";
+import SkillsView from "../components/skills/SkillsView.vue";
 import LoginForm from "../components/LoginForm.vue";
 import RegisterForm from "../components/RegisterForm.vue";
 
@@ -273,8 +276,21 @@ onUnmounted(() => {
           />
           <ShopView v-if="currentView === 'shop'" :characterId="characterId" />
           <SkillsTree
-            v-if="currentView === 'skills'"
+            v-if="currentView === 'skills-tree'"
             :characterId="characterId"
+          />
+          <TalentsView
+            v-if="currentView === 'talents'"
+            :character-id="characterId"
+          />
+          <ElementsView
+            v-if="currentView === 'elements'"
+            :character-id="characterId"
+          />
+          <SkillsView
+            v-if="currentView === 'skills'"
+            :character-id="characterId"
+            :character-level="character?.realm_level"
           />
           <LeaderboardView v-if="currentView === 'leaderboard'" />
           <FriendsList
@@ -298,9 +314,9 @@ onUnmounted(() => {
         <GameNavigation
           @feature-click="handleFeatureClick"
         />
-        <!-- EXP Bar -->
+        <!-- EXP Bar - Hidden in character view -->
         <ExpBar
-          v-if="character"
+          v-if="character && currentView !== 'character'"
           :exp="character.exp || 0"
           :exp-required="calculateExpRequired(character.realm_level)"
           @exp-updated="handleExpGained"

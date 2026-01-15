@@ -78,6 +78,7 @@ export const useAuth = () => {
     email: string,
     password: string,
     characterName: string,
+    talentId?: number,
   ) => {
     try {
       const response = await api.post('/auth/register', {
@@ -85,6 +86,7 @@ export const useAuth = () => {
         email,
         password,
         characterName,
+        talentId,
       });
       // api is axios instance, so response.data contains the actual data
       const { user, character, token } = response.data;

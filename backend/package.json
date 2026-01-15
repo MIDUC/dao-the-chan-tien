@@ -19,6 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node -r tsconfig-paths/register src/seed.ts",
+    "seed:talents": "ts-node -r tsconfig-paths/register src/seeds/seed-talents-only.ts",
+    "add:talents": "ts-node -r tsconfig-paths/register src/seeds/add-talents-to-character.ts",
+    "seed:test": "ts-node -r tsconfig-paths/register src/seeds/seed-test-data.ts",
     "fix:currency": "ts-node -r tsconfig-paths/register src/migrations/fix-currency-enum.ts",
     "fix:item-suffix": "ts-node -r tsconfig-paths/register src/migrations/remove-item-suffix.ts"
   },

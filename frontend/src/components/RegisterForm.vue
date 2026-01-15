@@ -48,6 +48,34 @@
         />
       </div>
 
+      <!-- Talent Selection -->
+      <div v-if="starterTalents.length > 0">
+        <label class="block text-sm text-gray-400 mb-2">Chọn Thiên Phú Khởi Đầu</label>
+        <div class="grid grid-cols-3 gap-2">
+          <div
+            v-for="talent in starterTalents"
+            :key="talent.id"
+            @click="selectedTalentId = talent.id"
+            class="talent-option p-3 rounded-lg border-2 cursor-pointer transition-all"
+            :class="
+              selectedTalentId === talent.id
+                ? 'border-yellow-500 bg-yellow-900/20'
+                : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+            "
+          >
+            <div class="text-xs font-semibold text-gray-200 mb-1">
+              {{ talent.name }}
+            </div>
+            <div class="text-[10px] text-gray-400 line-clamp-2">
+              {{ talent.description }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="loadingTalents" class="text-gray-400 text-sm text-center">
+        Đang tải thiên phú...
+      </div>
+
       <div v-if="error" class="text-red-400 text-sm text-center">{{ error }}</div>
 
       <button
@@ -73,8 +101,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useAuth } from '../composables/useAuth';
+import { api } from '../composables/useApi';
 
 const emit = defineEmits<{
   'switch-to-login': [];
@@ -86,8 +115,27 @@ const username = ref('');
 const email = ref('');
 const password = ref('');
 const characterName = ref('');
+const selectedTalentId = ref<number | undefined>(undefined);
+const starterTalents = ref<any[]>([]);
+const loadingTalents = ref(false);
 const loading = ref(false);
 const error = ref('');
+
+const fetchStarterTalents = async () => {
+  loadingTalents.value = true;
+  try {
+    const response = await api.get('/talents/starters');
+    starterTalents.value = response.data;
+    // Auto-select first talent if available
+    if (starterTalents.value.length > 0) {
+      selectedTalentId.value = starterTalents.value[0].id;
+    }
+  } catch (error) {
+    console.error('Error fetching starter talents:', error);
+  } finally {
+    loadingTalents.value = false;
+  }
+};
 
 const handleRegister = async () => {
   loading.value = true;
@@ -98,6 +146,7 @@ const handleRegister = async () => {
     email.value,
     password.value,
     characterName.value,
+    selectedTalentId.value,
   );
 
   if (result.success) {
@@ -108,5 +157,9 @@ const handleRegister = async () => {
 
   loading.value = false;
 };
+
+onMounted(() => {
+  fetchStarterTalents();
+});
 </script>
 

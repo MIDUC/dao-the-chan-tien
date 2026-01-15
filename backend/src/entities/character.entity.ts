@@ -5,9 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { CharacterTalent } from './character-talent.entity';
+import { CharacterElement } from './character-element.entity';
+import { CharacterSkill } from './character-skill.entity';
 
 @Entity('characters')
 export class Character {
@@ -83,6 +87,15 @@ export class Character {
   // Maximum inventory slots (can be expanded through breakthrough or purchase)
   @Column({ default: 20 })
   max_inventory_slots: number;
+
+  @OneToMany(() => CharacterTalent, (characterTalent) => characterTalent.character)
+  characterTalents: CharacterTalent[];
+
+  @OneToMany(() => CharacterElement, (element) => element.character)
+  elements: CharacterElement[];
+
+  @OneToMany(() => CharacterSkill, (characterSkill) => characterSkill.character)
+  characterSkills: CharacterSkill[];
 
   @CreateDateColumn()
   created_at: Date;

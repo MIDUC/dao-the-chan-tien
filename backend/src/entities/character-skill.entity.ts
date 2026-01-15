@@ -18,31 +18,31 @@ export class CharacterSkill {
   @Column()
   character_id: number;
 
-  @ManyToOne(() => Character)
-  @JoinColumn({ name: 'character_id' })
-  character: Character;
-
   @Column()
   skill_id: number;
 
-  @ManyToOne(() => Skill, (skill) => skill.character_skills)
-  @JoinColumn({ name: 'skill_id' })
-  skill: Skill;
-
-  // Level hiện tại của skill
   @Column({ default: 1 })
-  level: number;
+  level: number; // Cấp độ kỹ năng
 
-  // EXP của skill (để level up)
   @Column({ default: 0 })
-  exp: number;
+  exp: number; // EXP của kỹ năng
 
-  // Đã unlock chưa
   @Column({ default: false })
-  is_unlocked: boolean;
+  is_unlocked: boolean; // Đã mở khóa chưa
 
   @Column({ type: 'datetime', nullable: true })
-  unlocked_at: Date;
+  learned_at: Date; // Thời gian học được
+
+  @Column({ type: 'datetime', nullable: true })
+  unlocked_at: Date; // Thời gian mở khóa
+
+  @ManyToOne(() => Character, (character) => character.characterSkills)
+  @JoinColumn({ name: 'character_id' })
+  character: Character;
+
+  @ManyToOne(() => Skill, (skill) => skill.characterSkills)
+  @JoinColumn({ name: 'skill_id' })
+  skill: Skill;
 
   @CreateDateColumn()
   created_at: Date;
@@ -50,4 +50,3 @@ export class CharacterSkill {
   @UpdateDateColumn()
   updated_at: Date;
 }
-

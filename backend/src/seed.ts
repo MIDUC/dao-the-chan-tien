@@ -23,8 +23,16 @@ import { seedEquipment } from './seeds/equipment.seed';
 import { seedShops } from './seeds/shops.seed';
 import { seedQiEffects } from './seeds/qi-effects.seed';
 import { seedAncientArtifacts } from './seeds/ancient-artifacts.seed';
+import { seedTalents } from './seeds/talents.seed';
+import { seedSkills } from './seeds/skills.seed';
 import { addItemToInventory } from './utils/inventory.util';
 import { QiEffect } from './entities/qi.entity';
+import { Talent } from './entities/talent.entity';
+import { CharacterTalent } from './entities/character-talent.entity';
+import { CharacterElement, ElementType, ElementGrade } from './entities/character-element.entity';
+import { CharacterSkill } from './entities/character-skill.entity';
+import { Skill } from './entities/skill.entity';
+import { ItemType, ItemRarity } from './entities/item.entity';
 
 async function seed() {
   const dataSource = new DataSource(getDataSourceOptions());
@@ -969,6 +977,133 @@ async function seed() {
     console.log('\n💎 Seeding Ancient Artifacts...');
     await seedAncientArtifacts(dataSource);
     console.log('✅ Ancient Artifacts seeded');
+
+    // ========== SKILLS (Kỹ Năng) ==========
+    console.log('\n📚 Seeding Skills...');
+    await seedSkills();
+    console.log('✅ Skills seeded');
+
+    // ========== TALENTS (Thiên Phú) ==========
+    console.log('\n✨ Seeding Talents...');
+    await seedTalents();
+    console.log('✅ Talents seeded');
+
+    // Add talents to characters for testing
+    const talentRepo = dataSource.getRepository(Talent);
+    const characterTalentRepo = dataSource.getRepository(CharacterTalent);
+    const skillRepo = dataSource.getRepository(Skill);
+    const characterSkillRepo = dataSource.getRepository(CharacterSkill);
+    const elementRepo = dataSource.getRepository(CharacterElement);
+    
+    // Get all talents and skills
+    const allTalents = await talentRepo.find();
+    const allSkills = await skillRepo.find();
+    
+    // Add some talents, skills, and elements to first character (admin) for testing
+    if (savedCharacters.length > 0) {
+      const testCharacter = savedCharacters[0]; // Admin character
+      
+      // Add first 3 talents (starter talents) to test character
+      if (allTalents.length > 0) {
+        const talentsToAdd = allTalents.slice(0, 3);
+        
+        for (const talent of talentsToAdd) {
+          const existing = await characterTalentRepo.findOne({
+            where: {
+              character_id: testCharacter.id,
+              talent_id: talent.id,
+            },
+          });
+          
+          if (!existing) {
+            await characterTalentRepo.save({
+            character_id: testCharacter.id,
+            talent_id: talent.id,
+            obtained_at: new Date(),
+            obtained_from: 'seed',
+          });
+          console.log(`  ✅ Added talent: ${talent.name} (${talent.grade})`);
+        }
+      }
+
+      // Add first 3 skills to test character
+      const skillRepo = dataSource.getRepository(Skill);
+      const characterSkillRepo = dataSource.getRepository(CharacterSkill);
+      const allSkills = await skillRepo.find();
+      
+      if (allSkills.length > 0) {
+        const skillsToAdd = allSkills.slice(0, 3);
+        
+        for (const skill of skillsToAdd) {
+          const existing = await characterSkillRepo.findOne({
+            where: {
+              character_id: testCharacter.id,
+              skill_id: skill.id,
+            },
+          });
+          
+          if (!existing) {
+            const characterSkill = characterSkillRepo.create({
+              character_id: testCharacter.id,
+              skill_id: skill.id,
+              level: 1,
+              exp: 0,
+              is_unlocked: true,
+              learned_at: new Date(),
+              unlocked_at: new Date(),
+            });
+            await characterSkillRepo.save(characterSkill);
+            console.log(`  ✅ Learned skill: ${skill.name}`);
+          }
+        }
+      }
+
+      // Create some elements for test character
+      const elementRepo = dataSource.getRepository(CharacterElement);
+      const elementsToCreate = [
+        { type: ElementType.BANG, grade: ElementGrade.TOT, level: 5 },
+        { type: ElementType.HOA, grade: ElementGrade.HIEM, level: 3 },
+        { type: ElementType.THUY, grade: ElementGrade.TOT, level: 2 },
+      ];
+
+      for (const elemData of elementsToCreate) {
+        const existing = await elementRepo.findOne({
+          where: {
+            character_id: testCharacter.id,
+            element_type: elemData.type,
+          },
+        });
+
+        if (!existing) {
+          await elementRepo.save({
+            character_id: testCharacter.id,
+            element_type: elemData.type,
+            grade: elemData.grade,
+            level: elemData.level,
+            exp: 0,
+          });
+          console.log(`  ✅ Created element: ${elemData.type} (${elemData.grade}, level ${elemData.level})`);
+        }
+      }
+
+      // Add element items to inventory
+      const elementItems = allItems.filter(item => 
+        item.item_type === ItemType.MATERIAL && 
+        item.element && 
+        Array.isArray(item.element) && 
+        item.element.length > 0
+      );
+
+      if (elementItems.length > 0) {
+        // Add first few element items
+        for (const item of elementItems.slice(0, 5)) {
+          await addItemToInventory(inventoryRepo, testCharacter.id, item, 5);
+          console.log(`  ✅ Added 5x ${item.name} to inventory`);
+        }
+      }
+      
+      console.log(`✅ Added test data to character "${testCharacter.display_name}"`);
+    }
 
     console.log('\n🎉 Seed completed successfully!');
     console.log('\n📊 Summary:');

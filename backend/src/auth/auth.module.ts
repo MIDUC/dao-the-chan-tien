@@ -9,6 +9,7 @@ import { User } from '../entities/user.entity';
 import { Character } from '../entities/character.entity';
 import { CurrencyModule } from '../currency/currency.module';
 import { RolesModule } from '../roles/roles.module';
+import { TalentsModule } from '../talents/talents.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RolesModule } from '../roles/roles.module';
     }),
     CurrencyModule,
     RolesModule,
+    TalentsModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

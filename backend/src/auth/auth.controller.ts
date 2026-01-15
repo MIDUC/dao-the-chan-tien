@@ -14,6 +14,7 @@ export class AuthController {
       email: string;
       password: string;
       characterName: string;
+      talentId?: number;
     },
   ) {
     return this.authService.register(
@@ -21,6 +22,7 @@ export class AuthController {
       body.email,
       body.password,
       body.characterName,
+      body.talentId,
     );
   }
 

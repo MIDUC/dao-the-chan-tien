@@ -30,6 +30,9 @@ import { ItemsModule } from './items/items.module';
 import { QiModule } from './qi/qi.module';
 import { StatsModule } from './stats/stats.module';
 import { FitnessModule } from './fitness/fitness.module';
+import { TalentsModule } from './talents/talents.module';
+import { ElementsModule } from './elements/elements.module';
+import { SkillsModule } from './skills/skills.module';
 
 @Module({
   imports: [
@@ -63,6 +66,9 @@ import { FitnessModule } from './fitness/fitness.module';
     QiModule,
     StatsModule,
     FitnessModule,
+    TalentsModule,
+    ElementsModule,
+    SkillsModule,
   ],
   controllers: [AppController, UploadController], // <--- Đã sửa đúng tại đây
   providers: [AppService],

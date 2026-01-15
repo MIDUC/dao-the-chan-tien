@@ -6,19 +6,16 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { ElementType } from './character-element.entity';
 import { CharacterSkill } from './character-skill.entity';
 
-export enum SkillType {
-  PASSIVE = 'passive', // Kỹ năng thụ động
-  ACTIVE = 'active', // Kỹ năng chủ động
-  ULTIMATE = 'ultimate', // Kỹ năng tối thượng
-}
-
-export enum SkillCategory {
-  COMBAT = 'combat', // Chiến đấu
-  CULTIVATION = 'cultivation', // Tu luyện
-  CRAFTING = 'crafting', // Chế tạo
-  SOCIAL = 'social', // Xã hội
+/**
+ * Skill damage formula component
+ */
+export interface DamageFormula {
+  stat?: string; // Stat name like 'luc_dao', 'can_cot', etc.
+  element?: ElementType; // Element type
+  multiplier: number; // Multiplier percentage (e.g., 200 = 200%)
 }
 
 @Entity('skills')
@@ -26,58 +23,32 @@ export class Skill {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ unique: true })
+  code: string; // Unique code like 'hoa_van_chuong'
+
   @Column()
-  name: string;
+  name: string; // Tên kỹ năng
 
-  @Column({ type: 'text' })
-  description: string;
+  @Column({ type: 'text', nullable: true })
+  description: string; // Mô tả kỹ năng
 
-  @Column({
-    type: 'enum',
-    enum: SkillType,
-  })
-  skill_type: SkillType;
-
-  @Column({
-    type: 'enum',
-    enum: SkillCategory,
-  })
-  category: SkillCategory;
-
-  // Yêu cầu để học
   @Column({ type: 'json' })
-  requirements: {
-    realm_level?: number;
-    prerequisite_skill_ids?: number[]; // Skills cần học trước
-    item_cost?: Array<{ item_id: number; quantity: number }>;
-  };
+  damage_formula: DamageFormula[]; // Công thức sát thương
 
-  // Hiệu ứng skill (JSON)
-  @Column({ type: 'json' })
-  effects: {
-    stat_bonus?: {
-      strength?: number;
-      agility?: number;
-      wisdom?: number;
-    };
-    combat_damage?: number;
-    cooldown_seconds?: number;
-    duration_seconds?: number;
-  };
+  @Column({ default: 0 })
+  cooldown: number; // Thời gian hồi chiêu (giây)
 
-  // Max level của skill
+  @Column({ default: 0 })
+  mana_cost: number; // Chi phí mana/linh khí
+
   @Column({ default: 1 })
-  max_level: number;
-
-  // Icon URL
-  @Column({ nullable: true })
-  icon_url: string;
-
-  @OneToMany(() => CharacterSkill, (cs) => cs.skill)
-  character_skills: CharacterSkill[];
+  min_level: number; // Cấp độ tối thiểu để học
 
   @Column({ default: true })
   is_active: boolean;
+
+  @OneToMany(() => CharacterSkill, (characterSkill) => characterSkill.skill)
+  characterSkills: CharacterSkill[];
 
   @CreateDateColumn()
   created_at: Date;
@@ -85,4 +56,3 @@ export class Skill {
   @UpdateDateColumn()
   updated_at: Date;
 }
-
