@@ -5,7 +5,7 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // 10 seconds timeout
+  timeout: 120000, // 2 minutes timeout
 });
 
 // Set up interceptor to add token from localStorage

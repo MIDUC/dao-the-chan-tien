@@ -21,7 +21,7 @@ export const useCharacter = () => {
     try {
       // Thêm timeout để tránh hang mãi
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000);
+        setTimeout(() => reject(new Error('Request timeout after 2 minutes')), 120000);
       });
       
       // Dùng /auth/me để lấy thông tin user và character hiện tại
