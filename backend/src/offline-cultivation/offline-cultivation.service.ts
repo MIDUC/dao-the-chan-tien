@@ -98,17 +98,10 @@ export class OfflineCultivationService {
     });
 
     let skillMultiplier = 1.0;
-    for (const charSkill of cultivationSkills) {
-      const skill = charSkill.skill;
-      if (skill?.category === 'cultivation' && skill.effects) {
-        // Check if skill has EXP rate boost in effects
-        // Assuming effects can have exp_rate_boost percentage
-        const expBoost = (skill.effects as any).exp_rate_boost;
-        if (expBoost) {
-          skillMultiplier += (expBoost * charSkill.level) / 100;
-        }
-      }
-    }
+    // Note: Skill entity doesn't have category or effects properties
+    // If needed, these should be added to the Skill entity or stored differently
+    // For now, skill multiplier is set to 1.0 (no bonus from skills)
+    // TODO: Implement skill effects system if needed
 
     // Get achievements with EXP rate boost (from titles)
     const achievements = await this.characterAchievementRepository.find({

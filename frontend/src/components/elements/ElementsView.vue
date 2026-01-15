@@ -160,6 +160,7 @@ interface InventoryItem {
     element?: string[];
     rarity: string;
     icon_url?: string;
+    category?: string;
   };
 }
 

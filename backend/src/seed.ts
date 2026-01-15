@@ -1027,8 +1027,7 @@ async function seed() {
       }
 
       // Add first 3 skills to test character
-      const skillRepo = dataSource.getRepository(Skill);
-      const characterSkillRepo = dataSource.getRepository(CharacterSkill);
+      // Note: skillRepo and characterSkillRepo are already declared above
       const allSkills = await skillRepo.find();
       
       if (allSkills.length > 0) {
