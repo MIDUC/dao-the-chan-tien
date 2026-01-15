@@ -1017,12 +1017,13 @@ async function seed() {
           
           if (!existing) {
             await characterTalentRepo.save({
-            character_id: testCharacter.id,
-            talent_id: talent.id,
-            obtained_at: new Date(),
-            obtained_from: 'seed',
-          });
-          console.log(`  ✅ Added talent: ${talent.name} (${talent.grade})`);
+              character_id: testCharacter.id,
+              talent_id: talent.id,
+              obtained_at: new Date(),
+              obtained_from: 'seed',
+            });
+            console.log(`  ✅ Added talent: ${talent.name} (${talent.grade})`);
+          }
         }
       }
 
