@@ -30,6 +30,33 @@ export class ElementsService {
   }
 
   /**
+   * Initialize all elements for a new character
+   */
+  async initializeCharacterElements(characterId: number): Promise<CharacterElement[]> {
+    const elementTypes = Object.values(ElementType);
+    const elementEntries: CharacterElement[] = [];
+
+    for (const elementType of elementTypes) {
+      const existing = await this.elementRepository.findOne({
+        where: { character_id: characterId, element_type: elementType },
+      });
+
+      if (!existing) {
+        const element = this.elementRepository.create({
+          character_id: characterId,
+          element_type: elementType,
+          grade: ElementGrade.PHAM,
+          level: 1,
+          exp: 0,
+        });
+        elementEntries.push(await this.elementRepository.save(element));
+      }
+    }
+
+    return elementEntries;
+  }
+
+  /**
    * Get or create element for character
    */
   async getOrCreateElement(

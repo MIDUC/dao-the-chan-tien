@@ -23,7 +23,7 @@ import { SystemConfigModule } from './system-config/system-config.module';
 import { StatusLogsModule } from './status-logs/status-logs.module';
 import { RealmLevelsModule } from './realm-levels/realm-levels.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { UploadController } from './upload/upload.controller';
+import { UploadModule } from './upload/upload.module';
 import { QuestsModule } from './quests/quests.module';
 import { EquipmentModule } from './equipment/equipment.module';
 import { ItemsModule } from './items/items.module';
@@ -32,6 +32,9 @@ import { StatsModule } from './stats/stats.module';
 import { FitnessModule } from './fitness/fitness.module';
 import { TalentsModule } from './talents/talents.module';
 import { ElementsModule } from './elements/elements.module';
+import { GameMathModule } from './game-math/game-math.module';
+import { MonstersModule } from './monsters/monsters.module';
+import { CombatModule } from './combat/combat.module';
 
 @Module({
   imports: [
@@ -42,6 +45,7 @@ import { ElementsModule } from './elements/elements.module';
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(databaseConfig()),
     CloudinaryModule,
+    UploadModule,
     UsersModule,
     CharactersModule,
     NpcsModule,
@@ -67,8 +71,11 @@ import { ElementsModule } from './elements/elements.module';
     FitnessModule,
     TalentsModule,
     ElementsModule,
+    GameMathModule,
+    MonstersModule,
+    CombatModule,
   ],
-  controllers: [AppController, UploadController], // <--- Đã sửa đúng tại đây
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

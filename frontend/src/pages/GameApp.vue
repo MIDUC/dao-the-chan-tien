@@ -19,6 +19,7 @@ import EquipmentView from "../components/equipment/EquipmentView.vue";
 import TalentsView from "../components/talents/TalentsView.vue";
 import ElementsView from "../components/elements/ElementsView.vue";
 import SkillsView from "../components/skills/SkillsView.vue";
+import CombatView from "../components/combat/CombatView.vue";
 import LoginForm from "../components/LoginForm.vue";
 import RegisterForm from "../components/RegisterForm.vue";
 
@@ -303,6 +304,10 @@ onUnmounted(() => {
           />
           <InventoryView
             v-if="currentView === 'inventory'"
+            :characterId="characterId"
+          />
+          <CombatView
+            v-if="currentView === 'combat'"
             :characterId="characterId"
           />
         </div>

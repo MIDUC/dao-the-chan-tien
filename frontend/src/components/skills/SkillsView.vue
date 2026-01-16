@@ -42,8 +42,8 @@
         </div>
       </div>
 
-      <!-- Available Skills -->
-      <div>
+      <!-- Available Skills (Personal skills not yet learned) -->
+      <div v-if="availableSkills.length > 0">
         <h3 class="text-lg font-semibold text-gray-200 mb-3">Kỹ Năng Có Thể Học</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div
@@ -186,6 +186,7 @@ interface Skill {
   cooldown: number;
   mana_cost: number;
   min_level: number;
+  character_id?: number | null;
 }
 
 interface CharacterSkill {
@@ -207,15 +208,18 @@ const loading = ref(false);
 const learning = ref(false);
 
 const learnedSkills = computed(() => {
-  return characterSkills.value;
+  // Only show skills that are actually learned (have level > 0)
+  return characterSkills.value.filter(cs => cs.level > 0);
 });
 
 const availableSkills = computed(() => {
-  const learnedIds = new Set(characterSkills.value.map(cs => cs.skill.id));
+  const learnedIds = new Set(characterSkills.value.filter(cs => cs.level > 0).map(cs => cs.skill.id));
+  // Only show personal skills for this character that haven't been learned yet
   return allSkills.value.filter(skill => {
     if (learnedIds.has(skill.id)) return false;
     if (props.characterLevel && skill.min_level > props.characterLevel) return false;
-    return true;
+    // Only show personal skills for this character
+    return skill.character_id === props.characterId;
   });
 });
 

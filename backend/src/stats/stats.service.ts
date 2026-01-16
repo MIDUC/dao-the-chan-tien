@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { Character } from '../entities/character.entity';
 import { EquipmentService } from '../equipment/equipment.service';
 import { QiService } from '../qi/qi.service';
+import { ElementsService } from '../elements/elements.service';
+import { CharacterElement } from '../entities/character-element.entity';
+import { CharacterQi } from '../entities/qi.entity';
 
 /**
  * Primary Stats (Tầng Gốc) - Gắn với Fitness
@@ -58,11 +61,34 @@ export interface CombatStats {
  * Complete Character Stats
  */
 export interface CharacterStats {
+  // Basic Info
+  display_name: string;
+  realm_level: number;
+  exp: number;
+  base_exp_per_interval: number;
+  max_inventory_slots: number;
+  last_login_at: Date | null;
+  
+  // Stats
   primary: PrimaryStats;
   hidden: HiddenStats;
   combat: CombatStats;
-  realm_level: number;
-  exp: number;
+  
+  // Elements
+  elements: Array<{
+    type: string;
+    grade: string;
+    level: number;
+    exp: number;
+  }>;
+  
+  // Qi
+  qi: Array<{
+    type: string;
+    amount: number;
+    max_amount: number;
+    regen_rate: number;
+  }>;
 }
 
 @Injectable()
@@ -72,6 +98,7 @@ export class StatsService {
     private characterRepository: Repository<Character>,
     private equipmentService: EquipmentService,
     private qiService: QiService,
+    private elementsService: ElementsService,
   ) {}
 
   /**
@@ -224,14 +251,61 @@ export class StatsService {
     const primary = await this.getPrimaryStats(characterId);
     const hidden = await this.getHiddenStats(characterId);
     const combat = await this.calculateCombatStats(characterId);
+    
+    // Ensure all elements are initialized, then get them
+    let elements: Array<{ type: string; grade: string; level: number; exp: number }> = [];
+    try {
+      await this.elementsService.initializeCharacterElements(characterId);
+      const characterElements = await this.elementsService.getCharacterElements(characterId);
+      console.log(`[StatsService] Character ${characterId} has ${characterElements.length} elements`);
+      elements = characterElements.map(el => ({
+        type: el.element_type,
+        grade: el.grade,
+        level: el.level,
+        exp: el.exp,
+      }));
+    } catch (error) {
+      console.error(`[StatsService] Error initializing/getting elements for character ${characterId}:`, error);
+    }
+    
+    // Ensure all Qi are initialized, then get them
+    let qi: Array<{ type: string; amount: number; max_amount: number; regen_rate: number }> = [];
+    try {
+      await this.qiService.initializeCharacterQi(characterId);
+      const characterQi = await this.qiService.getCharacterQi(characterId);
+      console.log(`[StatsService] Character ${characterId} has ${characterQi.length} qi types`);
+      qi = characterQi.map(q => ({
+        type: q.qi_type,
+        amount: Number(q.amount),
+        max_amount: Number(q.max_amount),
+        regen_rate: Number(q.regen_rate),
+      }));
+    } catch (error) {
+      console.error(`[StatsService] Error initializing/getting qi for character ${characterId}:`, error);
+    }
 
-    return {
+    const result = {
+      display_name: character.display_name,
+      realm_level: character.realm_level,
+      exp: character.exp,
+      base_exp_per_interval: Number(character.base_exp_per_interval),
+      max_inventory_slots: character.max_inventory_slots,
+      last_login_at: character.last_login_at,
       primary,
       hidden,
       combat,
-      realm_level: character.realm_level,
-      exp: character.exp,
+      elements,
+      qi,
     };
+    
+    console.log(`[StatsService] Returning stats for character ${characterId}:`, {
+      elementsCount: elements.length,
+      qiCount: qi.length,
+      hasElements: elements.length > 0,
+      hasQi: qi.length > 0,
+    });
+    
+    return result;
   }
 
   /**

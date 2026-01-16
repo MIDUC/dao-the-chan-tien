@@ -8,6 +8,9 @@ import { Character } from '../entities/character.entity';
 import { CurrencyService } from '../currency/currency.service';
 import { CurrencyType } from '../entities/currency.entity';
 import { TalentsService } from '../talents/talents.service';
+import { SkillsService } from '../skills/skills.service';
+import { ElementsService } from '../elements/elements.service';
+import { QiService } from '../qi/qi.service';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +22,9 @@ export class AuthService {
     private jwtService: JwtService,
     private currencyService: CurrencyService,
     private talentsService: TalentsService,
+    private skillsService: SkillsService,
+    private elementsService: ElementsService,
+    private qiService: QiService,
   ) {}
 
   /**
@@ -89,6 +95,30 @@ export class AuthService {
         console.error('Error adding starter talent:', error);
         // Don't fail registration if talent addition fails
       }
+    }
+
+    // Create personal starter skills for this character
+    try {
+      await this.skillsService.createPersonalStarterSkills(savedCharacter.id);
+    } catch (error) {
+      console.error('Error creating personal starter skills:', error);
+      // Don't fail registration if skill creation fails
+    }
+
+    // Initialize all elements for this character
+    try {
+      await this.elementsService.initializeCharacterElements(savedCharacter.id);
+    } catch (error) {
+      console.error('Error initializing character elements:', error);
+      // Don't fail registration if element initialization fails
+    }
+
+    // Initialize all Qi for this character
+    try {
+      await this.qiService.initializeCharacterQi(savedCharacter.id);
+    } catch (error) {
+      console.error('Error initializing character Qi:', error);
+      // Don't fail registration if Qi initialization fails
     }
 
     // Generate JWT token

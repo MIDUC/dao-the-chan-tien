@@ -17,11 +17,13 @@ export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
   /**
-   * Get all skills
+   * Get all skills (global + personal for current user)
    */
   @Get()
-  async findAll() {
-    return this.skillsService.findAll();
+  @UseGuards(JwtAuthGuard)
+  async findAll(@Request() req) {
+    const characterId = req.user?.character?.id;
+    return this.skillsService.findAll(characterId);
   }
 
   /**

@@ -1,7 +1,29 @@
 <template>
   <div class="character-view w-full">
-    <!-- Main Content Area -->
-    <div class="w-full">
+    <!-- Tabs -->
+    <div class="flex gap-1 border-b border-gray-700 mb-2">
+      <button
+        @click="activeTab = 'main'"
+        class="px-3 py-1 text-sm font-semibold transition-colors"
+        :class="activeTab === 'main' 
+          ? 'text-purple-400 border-b-2 border-purple-400' 
+          : 'text-gray-400 hover:text-gray-300'"
+      >
+        Chính
+      </button>
+      <button
+        @click="activeTab = 'info'"
+        class="px-3 py-1 text-sm font-semibold transition-colors"
+        :class="activeTab === 'info' 
+          ? 'text-purple-400 border-b-2 border-purple-400' 
+          : 'text-gray-400 hover:text-gray-300'"
+      >
+        Thông Tin
+      </button>
+    </div>
+
+    <!-- Main Tab -->
+    <div v-if="activeTab === 'main'" class="w-full">
       <!-- Central Character Area -->
       <CharacterDisplay
         :can-breakthrough="canBreakthrough"
@@ -27,6 +49,11 @@
       <!-- Status Table -->
       <StatusTable :character-id="characterId" />
     </div>
+
+    <!-- Info Tab -->
+    <div v-if="activeTab === 'info'">
+      <CharacterInfoTab :character-id="characterId" :key="`info-${characterId}`" />
+    </div>
   </div>
 </template>
 
@@ -38,6 +65,7 @@ import CharacterDisplay from "./character-view/CharacterDisplay.vue";
 import CharacterStats from "./character-view/CharacterStats.vue";
 import StatusTable from "./character-view/StatusTable.vue";
 import BreakthroughModal from "./character-view/BreakthroughModal.vue";
+import CharacterInfoTab from "./character-view/CharacterInfoTab.vue";
 
 interface Character {
   id: number;
@@ -70,6 +98,7 @@ const calculateMysticPower = (): number => {
 
 const { fetchCharacter } = useCharacter();
 const showBreakthroughModal = ref(false);
+const activeTab = ref<'main' | 'info'>('main');
 
 // For now, use sync calculation (can be improved to fetch from API)
 const getExpRequired = (realmLevel: number): number => {

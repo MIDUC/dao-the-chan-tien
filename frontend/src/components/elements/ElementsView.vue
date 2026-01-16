@@ -7,15 +7,6 @@
       Đang tải linh căn...
     </div>
 
-    <!-- Debug: Show if items are being fetched -->
-    <div v-if="!loading" class="text-xs text-gray-500 mb-2 p-2 bg-gray-800 rounded">
-      <div>Debug Info:</div>
-      <div>characterId: {{ props.characterId }}</div>
-      <div>Total items in inventory: {{ elementItems.length }}</div>
-      <div>Selected element: {{ selectedElement?.type || 'none' }}</div>
-      <div>Filtered items: {{ selectedElement ? getItemsForElement(selectedElement.type).length : 0 }}</div>
-    </div>
-
     <!-- Elements Grid -->
     <div v-else class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
       <div
@@ -97,13 +88,6 @@
       <div>
         <h4 class="text-sm font-semibold text-gray-200 mb-2">Đá Ngũ Hành (Từ Túi Đồ)</h4>
         
-        <!-- Debug Info -->
-        <div class="text-xs text-gray-500 mb-2">
-          Debug: Total items: {{ elementItems.length }}, 
-          Selected element: {{ selectedElement.type }}, 
-          Filtered: {{ getItemsForElement(selectedElement.type).length }}
-        </div>
-        
         <div v-if="getItemsForElement(selectedElement.type).length > 0" class="grid grid-cols-3 gap-2">
           <button
             v-for="invItem in getItemsForElement(selectedElement.type)"
@@ -123,15 +107,6 @@
         </div>
         <div v-else class="text-xs text-gray-500">
           Không có đá ngũ hành {{ getElementName(selectedElement.type) }} trong túi đồ
-          <div class="text-xs text-gray-600 mt-1">
-            (Tìm thấy {{ elementItems.length }} items trong inventory, element type: {{ selectedElement.type }})
-          </div>
-          <div v-if="elementItems.length > 0" class="text-xs text-gray-400 mt-2">
-            Items có sẵn:
-            <div v-for="invItem in elementItems" :key="invItem.id" class="ml-2">
-              - {{ invItem.item.name }}: element = {{ JSON.stringify(invItem.item.element) }}
-            </div>
-          </div>
         </div>
       </div>
     </div>

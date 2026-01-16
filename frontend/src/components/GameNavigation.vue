@@ -267,8 +267,8 @@ const MAIN_CATEGORIES: MainCategory[] = [
         id: "chien-truong",
         label: "Chiến Trường",
         features: [
-          { id: "chien-dau", label: "Chiến Đấu", icon: Sword },
-          { id: "pvp", label: "PVP", icon: Shield },
+          { id: "chien-dau", label: "Chiến Đấu", icon: Sword, viewId: "combat" },
+          { id: "pvp", label: "PVP", icon: Shield, viewId: "combat" },
           { id: "arena", label: "Arena", icon: Trophy },
         ],
       },

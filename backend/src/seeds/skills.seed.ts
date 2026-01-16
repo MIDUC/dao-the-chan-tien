@@ -1,11 +1,14 @@
 import 'dotenv/config';
-import { DataSource } from 'typeorm';
+import { DataSource, IsNull } from 'typeorm';
 import { Skill, DamageFormula } from '../entities/skill.entity';
 import { getDataSourceOptions } from '../config/database.config';
 import { ElementType } from '../entities/character-element.entity';
 
 /**
  * Seed skills data
+ * Note: Skills are now personal (character_id != null) or global (character_id = null)
+ * This seed creates template skills that can be used as templates for personal skills
+ * Actual personal skills are created when characters register
  */
 export async function seedSkills() {
   const dataSource = new DataSource(getDataSourceOptions());
@@ -13,6 +16,8 @@ export async function seedSkills() {
 
   const skillRepository = dataSource.getRepository(Skill);
 
+  // These are template skills (global, character_id = null)
+  // They can be used as reference, but each character gets their own personal skills
   const skills = [
     {
       code: 'hoa_van_chuong',
@@ -96,8 +101,9 @@ export async function seedSkills() {
   console.log('🌱 Seeding skills...');
 
   for (const skillData of skills) {
+    // Check if global skill (character_id = null) already exists
     const existing = await skillRepository.findOne({
-      where: { code: skillData.code },
+      where: { code: skillData.code, character_id: IsNull() },
     });
 
     if (existing) {
@@ -105,7 +111,11 @@ export async function seedSkills() {
       continue;
     }
 
-    const skill = skillRepository.create(skillData);
+    // Set character_id to null for global/template skills
+    const skill = skillRepository.create({
+      ...skillData,
+      character_id: null, // Global skill
+    });
     await skillRepository.save(skill);
     console.log(`  ✅ Created skill: ${skillData.name} (${skillData.code})`);
   }

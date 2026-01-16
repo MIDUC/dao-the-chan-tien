@@ -88,6 +88,33 @@ export class Character {
   @Column({ default: 20 })
   max_inventory_slots: number;
 
+  // ========== Game Math Stats ==========
+  // Base stats (calculated from realm level and primary stats)
+  @Column({ type: 'json', nullable: true })
+  baseStats: {
+    atk: number;
+    def: number;
+    hp: number;
+    mp: number;
+    crit: number;
+    critDmg: number;
+    dodge: number;
+    accuracy: number;
+  };
+
+  // Final stats (cached, recalculated when equipment/talents change)
+  @Column({ type: 'json', nullable: true })
+  finalStats: {
+    atk: number;
+    def: number;
+    hp: number;
+    mp: number;
+    crit: number;
+    critDmg: number;
+    dodge: number;
+    accuracy: number;
+  };
+
   @OneToMany(() => CharacterTalent, (characterTalent) => characterTalent.character)
   characterTalents: CharacterTalent[];
 
